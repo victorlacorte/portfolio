@@ -16,7 +16,8 @@
 
 - Configurar o Jest
 
-  - Para o Jest funcionar com Typescript, é necessário configurar o [Babel](https://jestjs.io/docs/en/getting-started#using-typescript)
+  - Para o Jest funcionar com Typescript, é necessário configurar o
+    [Babel](https://jestjs.io/docs/en/getting-started#using-typescript)
 
 - Validar os testes
 
@@ -28,8 +29,10 @@
 
 ## Dúvidas
 
-- `export namespace` vs. `namespace`: alguma diferença na planilha? E nos testes?
+- `export namespace` vs. `namespace`: alguma diferença na planilha? E nos
+  testes?
 
 ## TODO
 
-- Não esquecer de explicitar a importância do arquivo `.clasp.json` na raiz com o `scriptId`
+- Não esquecer de explicitar a importância do arquivo `.clasp.json` na raiz com
+  o `scriptId`

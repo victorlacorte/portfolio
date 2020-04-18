@@ -4,7 +4,7 @@
   "description": "Clasp learning and project best practices",
   "scripts": {
     "build": "tsc",
-    "prettier": "prettier \"**/*.+(js|ts|json)\"",
+    "prettier": "prettier \"**/*.+(js|ts|json|md)\"",
     "format": "npm run prettier -- --write",
     "check-format": "npm run prettier -- --list-different",
     "test": "jest --watch",
@@ -24,10 +24,9 @@
     }
   },
   "lint-staged": {
-    "**/*.+(js|json|css|html|md)": [
-      "prettier",
-      "jest --findRelatedTests",
-      "git add"
+    "**/*.+(js|ts|json|md)": [
+      "prettier --write",
+      "jest --findRelatedTests"
     ]
   },
   "devDependencies": {
