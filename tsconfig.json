@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outFile": "dist/compiled.js",
+    "target": "ES3",
+    "lib": ["ESNext"],
+    "removeComments": true
+  }
+}
