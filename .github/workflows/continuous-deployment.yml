@@ -1,0 +1,54 @@
+name: CD
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+            ${{ runner.os }}-
+      - run: npm ci
+      - run: npm run validate
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-18.04
+    needs: test
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+          registry-url: 'https://registry.npmjs.org'
+      - uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+            ${{ runner.os }}-
+      - run: npm ci
+      - run: npm run build
+      - run: |
+          echo "$CLASP_AUTH" | base64 -d - > ~/.clasprc.json
+          echo "{\"scriptId\": \"${CLASP_ID}\"}" > .clasp.json
+          npm run clasp:push
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          CLASP_ID: ${{ secrets.CLASP_ID }}
+          CLASP_AUTH: ${{ secrets.CLASP_AUTH }}
