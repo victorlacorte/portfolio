@@ -1,16 +1,21 @@
 {
-  "name": "clasp_learning",
+  "name": "portfolio-gsheets",
   "version": "1.0.0",
-  "description": "Clasp learning and project best practices",
+  "description": "Code used by the GSheets Porfolio document",
   "scripts": {
     "build": "tsc",
     "prettier": "prettier \"**/*.+(js|ts|json|md)\"",
     "format": "npm run prettier -- --write",
     "check-format": "npm run prettier -- --list-different",
-    "test": "jest --watch",
+    "test": "jest",
+    "test:tdd": "jest --watch",
     "test:coverage": "jest --coverage",
     "validate": "npm run check-format && npm run build && npm run test",
-    "clasp:push": "npm run validate && clasp push"
+    "clasp:push": "clasp push"
+  },
+  "engines": {
+    "node": "^12.16.0",
+    "npm": "^6.14.0"
   },
   "jest": {
     "testEnvironment": "jest-environment-node",
