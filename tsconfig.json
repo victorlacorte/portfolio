@@ -2,8 +2,9 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outFile": "dist/compiled.js",
-    "target": "ES3",
+    "target": "ES2019",
     "lib": ["ESNext"],
-    "removeComments": true
+    "removeComments": true,
+    "types": ["node"]
   }
 }
