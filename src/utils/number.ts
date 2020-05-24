@@ -1,12 +1,10 @@
-type Separator = '.' | ',';
-
-namespace Utils {
+namespace NumberUtils {
   // mostly copied from https://github.com/adamwdraper/Numeral-js/blob/master/src/numeral.js
   /**
    * Computes the multiplier necessary to make x >= 1, effectively eliminating
    * miscalculations caused by finite precision.
    */
-  export function multiplier(x: number) {
+  export function multiplier(x: number): number {
     const parts = x.toString().split('.');
 
     return parts.length < 2 ? 1 : Math.pow(10, parts[1].length);
@@ -16,7 +14,7 @@ namespace Utils {
    * Given a variable number of arguments, returns the maximum multiplier that
    * must be used to normalize an operation involving all of them.
    */
-  export function correctionFactor(...args: number[]) {
+  export function correctionFactor(...args: number[]): number {
     return args.reduce((acc, curr) => {
       const currMultiplier = multiplier(curr);
 
@@ -24,7 +22,7 @@ namespace Utils {
     }, 1);
   }
 
-  export function add(...args: number[]) {
+  export function add(...args: number[]): number {
     const corrFactor = correctionFactor(...args);
 
     return (
@@ -33,13 +31,13 @@ namespace Utils {
     );
   }
 
-  export function sub(...args: number[]) {
+  export function sub(...args: number[]): number {
     const [first, ...rest] = args;
 
     return add(first, ...rest.map((num) => -num));
   }
 
-  export function mul(...args: number[]) {
+  export function mul(...args: number[]): number {
     return args.reduce((acc, curr) => {
       const corrFactor = correctionFactor(acc, curr);
 
@@ -50,7 +48,7 @@ namespace Utils {
     }, 1);
   }
 
-  export function div(...args: number[]) {
+  export function div(...args: number[]): number {
     return args.reduce((acc, curr) => {
       const corrFactor = correctionFactor(acc, curr);
 
@@ -58,20 +56,18 @@ namespace Utils {
     });
   }
 
-  export function toFixed(x: number, precision: number) {
+  export function toFixed(x: number, precision: number): number {
     const k = Math.pow(10, precision);
 
     return Math.round(x * k) / k;
   }
 
-  // TODO maybe we don't need the format and toCurrency functions since the
-  // spreadsheet already has them
   export function format(
     x: number,
     decimals: number,
-    decimalSeparator?: Separator,
-    thousandsSeparator?: Separator,
-  ) {
+    decimalSeparator?: Types.Separator,
+    thousandsSeparator?: Types.Separator,
+  ): string {
     const num = !isFinite(x) ? 0 : x,
       prec = !isFinite(decimals) ? 0 : Math.abs(decimals),
       dec = typeof decimalSeparator === 'undefined' ? '.' : decimalSeparator,
@@ -93,7 +89,15 @@ namespace Utils {
     return numAsStr.join(dec);
   }
 
-  export function toCurrency(x: number) {
+  export function toCurrency(x: number): string {
     return format(x, 2, '.', ',');
+  }
+
+  export function padStart(
+    x: number,
+    places: number,
+    fillString = '0',
+  ): string {
+    return String(x).padStart(places, fillString);
   }
 }

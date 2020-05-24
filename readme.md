@@ -1,38 +1,17 @@
-# Clasp Learning
+# Google Sheets Portfolio
 
-## Passo-a-passo
+## Custom spreadsheet deployment
 
-- Iniciar projeto em Typescript
+The current CD will deploy to a Spreadsheet generated with secrets from the
+repository, so in order to deploy to a custom one proceed as follows:
 
-  - `typescript.tsdk` apontando para a instalação local
+- Create a file named `.clasp.json` in the root with the desired
+  [`scriptId`](https://github.com/google/clasp/#scriptid-required)
 
-- Configurar o Prettier
+- `npm run validate && npm run clasp:push`
 
-- Validar o funcionamento do Prettier
+## Open questions
 
-- Configurar o ESLint
-
-- Validar o funcionamento do ESLint
-
-- Configurar o Jest
-
-  - Para o Jest funcionar com Typescript, é necessário configurar o
-    [Babel](https://jestjs.io/docs/en/getting-started#using-typescript)
-
-- Validar os testes
-
-- Configurar o Clasp
-
-  - Incluir script que exporta o código para a planilha
-
-- Validar a integração com o Clasp na planilha correspondente
-
-## Dúvidas
-
-- `export namespace` vs. `namespace`: alguma diferença na planilha? E nos
-  testes?
-
-## TODO
-
-- Não esquecer de explicitar a importância do arquivo `.clasp.json` na raiz com
-  o `scriptId`
+- Does migrating to the newly supported
+  [V8 engine](https://developers.google.com/apps-script/guides/v8-runtime) bring
+  any inconsistencies?
