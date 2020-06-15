@@ -7,9 +7,6 @@
     "node": true,
     "jest": true
   },
-  "globals": {
-    "dist": "readonly"
-  },
   "rules": {
     "no-inner-declarations": "off"
   },
@@ -41,7 +38,7 @@
       }
     },
     {
-      "files": ["__tests__/*.js"],
+      "files": ["**/*.test.ts"],
       "rules": {
         "no-sparse-arrays": "off",
         "no-debugger": "off"

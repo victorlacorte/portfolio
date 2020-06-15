@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "outFile": "dist/compiled.js",
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"]
+    },
     "target": "ES2019",
     "lib": ["ESNext"],
-    "removeComments": true,
-    "types": ["node"]
-  }
+    "moduleResolution": "Node",
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"]
 }
