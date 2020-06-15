@@ -1,46 +1,97 @@
-namespace DateUtils {
-  export function parse(date: Date): Types.ParsedDate {
-    const d = new Date(date);
+import { NumberUtils } from 'src/utils/number';
+import { Types } from 'src/utils/types';
 
-    return {
-      year: d.getUTCFullYear(),
-      // getUTCMonth is 0-indexed
-      month: d.getUTCMonth() + 1,
-      day: d.getUTCDate(),
-    };
-  }
-
-  // TODO we are forcing the "less than or equal to" comparison. Is this always
-  // the case?
-  // TODO the exception should not be thrown inside this function, but rather
-  // on the validation one
+/**
+ * TODO we could have Month and Day types: would it help, though? We already
+ * validate CalendarDates upon construction.
+ */
+export namespace DateUtils {
   /**
-   * We parse and create a new Date since we want to compare against `year` and `month` only,
-   * and the `paramDate` we create will have a day as well.
-   *
-   * @param year
-   * @param month
-   * @param dates
+   * YYYY/MM/DD convention
    */
-  export function filterDates(
-    year: number,
-    month: number,
-    dates: Date[],
-    compareFn = (d: Date, base: Date) => d <= base,
-  ): Date[] {
-    const paramDate = new Date(year, month - 1);
+  export class CalendarDate implements Types.CalendarDate {
+    private readonly _year: number;
+    private readonly _month: number;
+    private readonly _day: number;
 
-    const relevant = dates.filter((date) => {
-      const parsed = parse(new Date(date));
-      const currDate = new Date(parsed.year, parsed.month - 1);
+    constructor(year: number, month: number, day: number) {
+      this._year = year;
+      this._month = month;
+      this._day = day;
 
-      return compareFn(currDate, paramDate);
-    });
-
-    if (!relevant.length) {
-      throw new Error('No relevant dates provided');
+      if (!this.valid()) {
+        throw new Error(`Invalid date: ${this}`);
+      }
     }
 
-    return relevant;
+    static fromJSDate(d: Date): CalendarDate {
+      return new this(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
+    }
+
+    get year(): number {
+      return this._year;
+    }
+
+    get month(): number {
+      return this._month;
+    }
+
+    get day(): number {
+      return this._day;
+    }
+
+    toJSDate(): Date {
+      return new Date(this.year, this.month - 1, this.day);
+    }
+
+    /**
+     * [Dates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
+     * are "too smart" and will convert invalid dates to valid ones e.g.
+     *
+     * const d = new Date(2020, 1, 30); // invalid date: february 30th does not exist
+     * d.getUTCDate() // 1
+     * d.getUTCMonth() // 2 i.e. march
+     *
+     * This behavior might not be desired hence this function exists to validate
+     * calendar dates.
+     */
+    valid(): boolean {
+      if (this.toJSDate().getUTCDate() !== this.day) {
+        return false;
+      }
+      return true;
+    }
+
+    toJSON(): string {
+      return this.toString();
+    }
+
+    toString(): string {
+      const y = this.year,
+        m = NumberUtils.padStart(this.month, 2),
+        d = NumberUtils.padStart(this.day, 2);
+
+      return `${y}/${m}/${d}`;
+    }
+  }
+
+  // https://jsperf.com/days-in-month-perf-test/6
+  // https://www.ecma-international.org/ecma-262/10.0/index.html#eqn-DaysInYear
+  /**
+   * Pay attention to the leaping year definition
+   * @param month 1 indexed: 1-12
+   */
+  export function daysIn(year: number, month: number): 28 | 29 | 30 | 31 {
+    switch (month) {
+      case 2:
+        return (year % 4 == 0 && year % 100) || year % 400 == 0 ? 29 : 28;
+      case 4:
+      case 6:
+      case 9:
+      case 11:
+        return 30;
+      default:
+        return 31;
+    }
   }
 }

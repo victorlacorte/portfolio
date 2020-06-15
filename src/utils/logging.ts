@@ -1,29 +1,13 @@
-namespace LoggingUtils {
+export namespace LoggingUtils {
   export class Logger {
-    private static _instance: Logger;
-    private entries = [];
+    private _entries: string[] = [];
 
-    private constructor() {}
-
-    static instance(): Logger {
-      if (!Logger._instance) {
-        Logger._instance = new Logger();
-      }
-
-      return Logger._instance;
+    get entries(): string {
+      return this._entries.join('\n');
     }
 
-    log(entry: string): void {
-      this.entries.push(entry);
-    }
-
-    view(): string {
-      return this.entries.join('\n');
-    }
-
-    // TODO necessary?
-    clear(): void {
-      this.entries = [];
+    set entries(entry: string) {
+      this._entries.push(entry);
     }
   }
 }

@@ -15,3 +15,12 @@ to deploy to a custom one proceed as follows:
 - Does migrating to the newly supported
   [V8 engine](https://developers.google.com/apps-script/guides/v8-runtime) bring any
   inconsistencies?
+
+## TODO
+
+- There are certain business rules that must be enforced:
+
+  - selling a ticker and rebuying it in the same day is not valid, but the opposite is
+
+- The snapshot feature still needs tuning in order to easily aid during tax declarations e.g. "NA
+  entries" should be removed drom such snapshots since they are mostly useless for this goal.

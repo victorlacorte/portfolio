@@ -1,5 +1,8 @@
-namespace NumberUtils {
+import { Messages } from 'src/utils/messages';
+
+export namespace NumberUtils {
   // mostly copied from https://github.com/adamwdraper/Numeral-js/blob/master/src/numeral.js
+
   /**
    * Computes the multiplier necessary to make x >= 1, effectively eliminating
    * miscalculations caused by finite precision.
@@ -25,10 +28,7 @@ namespace NumberUtils {
   export function add(...args: number[]): number {
     const corrFactor = correctionFactor(...args);
 
-    return (
-      args.reduce((acc, curr) => acc + Math.round(corrFactor * curr), 0) /
-      corrFactor
-    );
+    return args.reduce((acc, curr) => acc + Math.round(corrFactor * curr), 0) / corrFactor;
   }
 
   export function sub(...args: number[]): number {
@@ -42,8 +42,7 @@ namespace NumberUtils {
       const corrFactor = correctionFactor(acc, curr);
 
       return (
-        (Math.round(corrFactor * acc) * Math.round(corrFactor * curr)) /
-        Math.round(corrFactor ** 2)
+        (Math.round(corrFactor * acc) * Math.round(corrFactor * curr)) / Math.round(corrFactor ** 2)
       );
     }, 1);
   }
@@ -56,6 +55,9 @@ namespace NumberUtils {
     });
   }
 
+  /**
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed#Description
+   */
   export function toFixed(x: number, precision: number): number {
     const k = Math.pow(10, precision);
 
@@ -64,21 +66,23 @@ namespace NumberUtils {
 
   export function format(
     x: number,
-    decimals: number,
-    decimalSeparator?: Types.Separator,
-    thousandsSeparator?: Types.Separator,
+    decimals = 0,
+    decimalSeparator = '.',
+    thousandsSeparator = ',',
   ): string {
-    const num = !isFinite(x) ? 0 : x,
-      prec = !isFinite(decimals) ? 0 : Math.abs(decimals),
-      dec = typeof decimalSeparator === 'undefined' ? '.' : decimalSeparator,
-      sep =
-        typeof thousandsSeparator === 'undefined' ? ',' : thousandsSeparator,
-      numAsStr = (prec ? toFixed(num, prec) : Math.round(num))
-        .toString()
-        .split('.');
+    if (!isFinite(x)) {
+      throw new Error(Messages.expectedFinite(x));
+    }
+
+    if (!isFinite(decimals)) {
+      throw new Error(Messages.expectedFinite(decimals));
+    }
+
+    const prec = Math.abs(decimals);
+    const numAsStr = toFixed(x, prec).toString().split('.');
 
     if (numAsStr[0].length > 3) {
-      numAsStr[0] = numAsStr[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+      numAsStr[0] = numAsStr[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, thousandsSeparator);
     }
 
     if ((numAsStr[1] || '').length < prec) {
@@ -86,18 +90,14 @@ namespace NumberUtils {
       numAsStr[1] += new Array(prec - numAsStr[1].length + 1).join('0');
     }
 
-    return numAsStr.join(dec);
+    return numAsStr.join(decimalSeparator);
   }
 
   export function toCurrency(x: number): string {
     return format(x, 2, '.', ',');
   }
 
-  export function padStart(
-    x: number,
-    places: number,
-    fillString = '0',
-  ): string {
+  export function padStart(x: number, places: number, fillString = '0'): string {
     return String(x).padStart(places, fillString);
   }
 }
