@@ -33,6 +33,7 @@ export namespace Finance {
       }
     }
 
+    // We don't call NumberUtils.add when dealing with integer amounts e.g. purchased or sold quantities
     private addBuyTransaction(t: Types.Transaction): void {
       const { ticker, quantity, total } = t;
 
@@ -46,7 +47,20 @@ export namespace Finance {
             qty: 0,
             total: 0,
           },
+          averagePrice: 0,
         };
+      }
+
+      if (!this.stats[ticker].averagePrice) {
+        this.stats[ticker].averagePrice = NumberUtils.div(total, quantity);
+      } else {
+        const currentQty = this.stats[ticker].purchased.qty - this.stats[ticker].sold.qty;
+        const currentValue = NumberUtils.mul(this.stats[ticker].averagePrice, currentQty);
+
+        this.stats[ticker].averagePrice = NumberUtils.div(
+          NumberUtils.add(currentValue, total),
+          currentQty + quantity,
+        );
       }
 
       this.stats[ticker].purchased.qty += quantity;
@@ -58,6 +72,7 @@ export namespace Finance {
       this.onPurchase(t, this.stats);
     }
 
+    // TODO is it really necessary to delete closed positions?
     private addSellTransaction(t: Types.Transaction): void {
       const { ticker, quantity, total } = t;
       if (
