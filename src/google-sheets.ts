@@ -143,14 +143,9 @@ export namespace GoogleSheets {
       }
 
       if (transaction.date.year === endDate.year && transaction.date.month === endDate.month) {
-        const averagePrice = NumberUtils.div(
-          stats[transaction.ticker].purchased.total,
-          stats[transaction.ticker].purchased.qty,
-        );
-
         const currProfit = NumberUtils.sub(
           transaction.total,
-          NumberUtils.mul(transaction.quantity, averagePrice),
+          NumberUtils.mul(transaction.quantity, stats[transaction.ticker].averagePrice),
         );
 
         total += transaction.total;
@@ -228,7 +223,7 @@ export namespace GoogleSheets {
           purchasedTotal: stats[ticker].purchased.total,
           soldQuantity: stats[ticker].sold.qty,
           soldTotal: stats[ticker].sold.total,
-          averagePrice: NumberUtils.div(stats[ticker].purchased.total, stats[ticker].purchased.qty),
+          averagePrice: stats[ticker].averagePrice,
           log: control[ticker].entries,
         };
       }
