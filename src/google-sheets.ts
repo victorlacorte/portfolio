@@ -102,9 +102,8 @@ export namespace GoogleSheets {
     const parsedTotal = NumberUtils.toCurrency(total);
     const parsedProfit = NumberUtils.toCurrency(profit);
     const parsedTaxDeduction = NumberUtils.toCurrency(taxDeduction);
-    const profitPercent = NumberUtils.toFixed((profit / total) * 100, 2);
 
-    return `${date}: [${parsedTicker}] quantity=${parsedQuantity}, total=${parsedTotal}, profit=${parsedProfit} (${profitPercent}%), tax=${parsedTaxDeduction}`;
+    return `${date}: [${parsedTicker}] quantity=${parsedQuantity}, total=${parsedTotal}, profit=${parsedProfit}, tax=${parsedTaxDeduction}`;
   }
 
   /**
