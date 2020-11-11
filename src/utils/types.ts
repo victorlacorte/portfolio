@@ -19,6 +19,7 @@ export namespace Types {
     [ticker: string]: {
       purchased: StatsControl;
       sold: StatsControl;
+      averagePrice: number;
     };
   };
 
