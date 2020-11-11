@@ -103,7 +103,6 @@ export namespace Finance {
    * but `quantity` seems to be strictly positive.
    */
   export class Transaction implements Types.Transaction {
-    private readonly _jsDate: Date;
     private readonly _date: Types.CalendarDate;
     private readonly _ticker: string;
     private readonly _operation: Types.Operation;
@@ -125,7 +124,6 @@ export namespace Finance {
       }
 
       this._date = date;
-      this._jsDate = date.toJSDate();
       this._ticker = ticker.toLowerCase();
       this._operation = operation.toLowerCase() as Types.Operation;
       this._quantity = quantity;
@@ -135,10 +133,6 @@ export namespace Finance {
 
     get date(): Types.CalendarDate {
       return this._date;
-    }
-
-    get jsDate(): Date {
-      return this._jsDate;
     }
 
     get ticker(): string {
@@ -196,8 +190,8 @@ export namespace Finance {
     const p = new Portfolio(onPurchase, onSell);
 
     transactions
-      .filter((t) => t.jsDate >= start && t.jsDate <= end)
-      .sort((t1, t2) => Number(t1.jsDate) - Number(t2.jsDate))
+      .filter((t) => t.date.toJSDate() >= start && t.date.toJSDate() <= end)
+      .sort((t1, t2) => Number(t1.date.toJSDate()) - Number(t2.date.toJSDate()))
       .forEach((t) => {
         p.add(t);
       });
