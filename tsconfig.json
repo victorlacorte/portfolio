@@ -2,13 +2,9 @@
   "compilerOptions": {
     "noEmit": true,
     "baseUrl": ".",
-    "paths": {
-      "src/*": ["src/*"]
-    },
     "target": "ES2019",
     "lib": ["ESNext"],
     "moduleResolution": "Node",
     "esModuleInterop": true
-  },
-  "include": ["src/**/*"]
+  }
 }
