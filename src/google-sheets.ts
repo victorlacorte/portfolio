@@ -161,15 +161,17 @@ export namespace GoogleSheets {
         profit += currProfit;
         taxDeduction += transaction.taxDeduction;
 
-        logger.entries = profitLogMsg({
-          date: transaction.date,
-          ticker: transaction.ticker,
-          quantity: transaction.quantity,
-          purchasedValue,
-          profit: currProfit,
-          taxDeduction: transaction.taxDeduction,
-          total: transaction.total,
-        });
+        logger.add(
+          profitLogMsg({
+            date: transaction.date,
+            ticker: transaction.ticker,
+            quantity: transaction.quantity,
+            purchasedValue,
+            profit: currProfit,
+            taxDeduction: transaction.taxDeduction,
+            total: transaction.total,
+          }),
+        );
       }
     }
 
@@ -180,7 +182,7 @@ export namespace GoogleSheets {
       onSell: handleSell,
     });
 
-    return { total, profit, taxDeduction, log: logger.entries };
+    return { total, profit, taxDeduction, log: logger.join() };
   }
 
   type SnapshotReturn = {
@@ -214,7 +216,7 @@ export namespace GoogleSheets {
         control[transaction.ticker] = new LoggingUtils.Logger();
       }
 
-      control[transaction.ticker].entries = GoogleSheets.snapshotLogMsg(transaction);
+      control[transaction.ticker].add(GoogleSheets.snapshotLogMsg(transaction));
     }
 
     const stats = Finance.statsFrom({
@@ -234,7 +236,7 @@ export namespace GoogleSheets {
           soldQuantity: stats[ticker].sold.qty,
           soldTotal: stats[ticker].sold.total,
           averagePrice: stats[ticker].averagePrice,
-          log: control[ticker].entries,
+          log: control[ticker].join(),
         };
       }
 
@@ -245,7 +247,7 @@ export namespace GoogleSheets {
         soldQuantity: 'NA',
         soldTotal: 'NA',
         averagePrice: 'NA',
-        log: control[ticker].entries,
+        log: control[ticker].join(),
       };
     });
   }
