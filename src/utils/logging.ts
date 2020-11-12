@@ -2,11 +2,15 @@ export namespace LoggingUtils {
   export class Logger {
     private _entries: string[] = [];
 
-    get entries(): string {
-      return this._entries.join('\n');
+    get entries(): string[] {
+      return this._entries;
     }
 
-    set entries(entry: string) {
+    join(separator = '\n'): string {
+      return this._entries.join(separator);
+    }
+
+    add(entry: string): void {
       this._entries.push(entry);
     }
   }
