@@ -149,11 +149,12 @@ describe('GoogleSheets', () => {
       ticker: 'foo1',
       quantity: 100,
       total: 1000,
+      purchasedValue: 900,
       profit: 10,
       taxDeduction: 1,
     };
     expect(GoogleSheets.profitLogMsg(stats)).toMatchInlineSnapshot(
-      `"2020/01/01: [FOO1] quantity=100, total=1,000.00, profit=10.00 (1%), tax=1.00"`,
+      `"2020/01/01: [FOO1] quantity=100, total=1,000.00, profit=10.00 (1.11%), tax=1.00"`,
     );
   });
 
@@ -238,7 +239,7 @@ describe('GoogleSheets', () => {
 
       expect(GoogleSheets.profit(stats)).toMatchInlineSnapshot(`
         Object {
-          "log": "2020/01/01: [FOO1] quantity=100, total=1,100.00, profit=100.00 (9.09%), tax=1.00",
+          "log": "2020/01/01: [FOO1] quantity=100, total=1,100.00, profit=100.00 (10%), tax=1.00",
           "profit": 100,
           "taxDeduction": 1,
           "total": 1100,
