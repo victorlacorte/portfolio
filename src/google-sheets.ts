@@ -89,21 +89,29 @@ export namespace GoogleSheets {
     );
   }
 
+  type ProfitLogMsg = {
+    purchasedValue: number;
+    profit: number;
+  } & Omit<Types.Transaction, 'operation'>;
+
   export function profitLogMsg({
     date,
     ticker,
     quantity,
     total,
+    purchasedValue,
     profit,
     taxDeduction,
-  }: Omit<Types.Transaction, 'operation'> & { profit: number }): string {
+  }: ProfitLogMsg): string {
     const parsedTicker = ticker.toUpperCase();
     const parsedQuantity = NumberUtils.format(quantity);
     const parsedTotal = NumberUtils.toCurrency(total);
     const parsedProfit = NumberUtils.toCurrency(profit);
     const parsedTaxDeduction = NumberUtils.toCurrency(taxDeduction);
 
-    return `${date}: [${parsedTicker}] quantity=${parsedQuantity}, total=${parsedTotal}, profit=${parsedProfit}, tax=${parsedTaxDeduction}`;
+    const profitPercent = NumberUtils.toFixed(NumberUtils.div(profit, purchasedValue) * 100, 2);
+
+    return `${date}: [${parsedTicker}] quantity=${parsedQuantity}, total=${parsedTotal}, profit=${parsedProfit} (${profitPercent}%), tax=${parsedTaxDeduction}`;
   }
 
   /**
@@ -142,10 +150,12 @@ export namespace GoogleSheets {
       }
 
       if (transaction.date.year === endDate.year && transaction.date.month === endDate.month) {
-        const currProfit = NumberUtils.sub(
-          transaction.total,
-          NumberUtils.mul(transaction.quantity, stats[transaction.ticker].averagePrice),
+        const purchasedValue = NumberUtils.mul(
+          transaction.quantity,
+          stats[transaction.ticker].averagePrice,
         );
+
+        const currProfit = NumberUtils.sub(transaction.total, purchasedValue);
 
         total += transaction.total;
         profit += currProfit;
@@ -155,6 +165,7 @@ export namespace GoogleSheets {
           date: transaction.date,
           ticker: transaction.ticker,
           quantity: transaction.quantity,
+          purchasedValue,
           profit: currProfit,
           taxDeduction: transaction.taxDeduction,
           total: transaction.total,
@@ -183,7 +194,7 @@ export namespace GoogleSheets {
   };
 
   /**
-   * TODO we could list the actual values rather than "NA" but it would modify
+   * TODO we could list the actual values rather than return "NA" but it would modify
    * the Finance.statsFrom function i.e. we need to delete closed position
    * tickers but they still need to be logged for improved visibility. As of now,
    * we simply delete them, and utilize the OperationCallbacks to record
