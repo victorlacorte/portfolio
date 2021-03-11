@@ -1,3 +1,4 @@
+.clasp.json
+.vscode
 dist
 node_modules
-.clasp.json
