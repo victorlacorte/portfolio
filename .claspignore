@@ -1,3 +1,3 @@
 **/**
-!dist/compiled.js
+!dist/*.js
 !appsscript.json

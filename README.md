@@ -8,17 +8,11 @@ repository, so in order to deploy to a custom one proceed as follows:
 - Create a file named `.clasp.json` in the root with the desired
   [`scriptId`](https://github.com/google/clasp/#scriptid-required)
 
-- `npm run validate && npm run clasp:push`
+- `npm run validate && npm run build && npm run clasp:push`
 
 ## Google Sheets Data Types
 
-TODO
-
 ## Open questions
-
-- Does migrating to the newly supported
-  [V8 engine](https://developers.google.com/apps-script/guides/v8-runtime) bring
-  any inconsistencies?
 
 ## TODO
 
