@@ -1,17 +1,15 @@
-export namespace LoggingUtils {
-  export class Logger {
-    private _entries: string[] = [];
+export class Logger {
+  private _entries: string[] = [];
 
-    get entries(): string[] {
-      return this._entries;
-    }
+  get entries(): string[] {
+    return this._entries;
+  }
 
-    join(separator = '\n'): string {
-      return this._entries.join(separator);
-    }
+  join(separator = '\n'): string {
+    return this._entries.join(separator);
+  }
 
-    add(entry: string): void {
-      this._entries.push(entry);
-    }
+  add(entry: string): void {
+    this._entries.push(entry);
   }
 }

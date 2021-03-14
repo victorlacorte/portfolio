@@ -1,8 +1,8 @@
-import { DateUtils } from './date';
+import { CalendarDate, daysIn } from './date';
 
 describe('CalendarDate', () => {
   it('Throws when provided an invalid date', () => {
-    expect(() => new DateUtils.CalendarDate(2020, 2, 30)).toThrow();
+    expect(() => new CalendarDate(2020, 2, 30)).toThrow();
   });
 
   it('fromJSDate(x.toJSDate()) === x, x: CalendarDate', () => {
@@ -13,8 +13,8 @@ describe('CalendarDate', () => {
     ];
 
     dates.forEach(({ year, month, day }) => {
-      const cd = new DateUtils.CalendarDate(year, month, day);
-      expect(DateUtils.CalendarDate.fromJSDate(cd.toJSDate())).toEqual(cd);
+      const cd = new CalendarDate(year, month, day);
+      expect(CalendarDate.fromJSDate(cd.toJSDate())).toEqual(cd);
     });
   });
 
@@ -22,7 +22,7 @@ describe('CalendarDate', () => {
     const dates = [];
 
     dates.forEach((date) => {
-      const cd = DateUtils.CalendarDate.fromJSDate(date);
+      const cd = CalendarDate.fromJSDate(date);
       expect(cd.toJSDate()).toBe(date);
     });
   });
@@ -54,7 +54,7 @@ describe('daysIn', () => {
     ];
 
     testCases.forEach(({ year, month, days }) => {
-      expect(DateUtils.daysIn(year, month)).toBe(days);
+      expect(daysIn(year, month)).toBe(days);
     });
   });
 });

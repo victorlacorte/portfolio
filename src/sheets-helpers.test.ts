@@ -1,16 +1,18 @@
-import { DateUtils } from 'src/utils/date';
+import * as DateUtils from 'src/utils/date';
 
-import { GoogleSheets } from './google-sheets';
+import * as GoogleSheets from './sheets-helpers';
 
 describe('GoogleSheets', () => {
   test('sanitizeSparseMatrix', () => {
     expect(GoogleSheets.sanitizeSparseMatrix([[1], [2], , ,])).toEqual([1, 2]);
-    expect(GoogleSheets.sanitizeSparseMatrix([[1], [2], , [3]])).toEqual([1, 2, 3]);
-    expect(GoogleSheets.sanitizeSparseMatrix([['a'], ['b'], , ['c'], ['']])).toEqual([
-      'a',
-      'b',
-      'c',
+    expect(GoogleSheets.sanitizeSparseMatrix([[1], [2], , [3]])).toEqual([
+      1,
+      2,
+      3,
     ]);
+    expect(
+      GoogleSheets.sanitizeSparseMatrix([['a'], ['b'], , ['c'], ['']]),
+    ).toEqual(['a', 'b', 'c']);
   });
 
   test('sameLength', () => {
@@ -67,7 +69,8 @@ describe('GoogleSheets', () => {
         taxDeductions: [[0], [1]],
       });
 
-      expect(t.map((entry) => JSON.parse(String(entry)))).toMatchInlineSnapshot(`
+      expect(t.map((entry) => JSON.parse(String(entry))))
+        .toMatchInlineSnapshot(`
         Array [
           Object {
             "date": "2020/01/01",
@@ -98,7 +101,8 @@ describe('GoogleSheets', () => {
         totals: [[1000], [1000]],
       });
 
-      expect(t.map((entry) => JSON.parse(String(entry)))).toMatchInlineSnapshot(`
+      expect(t.map((entry) => JSON.parse(String(entry))))
+        .toMatchInlineSnapshot(`
         Array [
           Object {
             "date": "2020/01/01",
@@ -123,24 +127,45 @@ describe('GoogleSheets', () => {
 
   test('sanitizeDates', () => {
     expect(
-      GoogleSheets.sanitizeDates([[new Date(2020, 0, 1)], [new Date(2020, 0, 1)], , ,]),
-    ).toEqual([new DateUtils.CalendarDate(2020, 1, 1), new DateUtils.CalendarDate(2020, 1, 1)]);
+      GoogleSheets.sanitizeDates([
+        [new Date(2020, 0, 1)],
+        [new Date(2020, 0, 1)],
+        ,
+        ,
+      ]),
+    ).toEqual([
+      new DateUtils.CalendarDate(2020, 1, 1),
+      new DateUtils.CalendarDate(2020, 1, 1),
+    ]);
   });
 
   test('sanitizeTickers', () => {
-    expect(GoogleSheets.sanitizeTickers([['foo1'], ['foo2'], ,])).toEqual(['foo1', 'foo2']);
+    expect(GoogleSheets.sanitizeTickers([['foo1'], ['foo2'], ,])).toEqual([
+      'foo1',
+      'foo2',
+    ]);
   });
 
   test('sanitizeOperations', () => {
-    expect(GoogleSheets.sanitizeOperations([['buy'], ['sell'], ,])).toEqual(['buy', 'sell']);
-    expect(() => GoogleSheets.sanitizeOperations([['buy'], ['foo'], ,])).toThrow();
+    expect(GoogleSheets.sanitizeOperations([['buy'], ['sell'], ,])).toEqual([
+      'buy',
+      'sell',
+    ]);
+    expect(() =>
+      GoogleSheets.sanitizeOperations([['buy'], ['foo'], ,]),
+    ).toThrow();
   });
 
   test('sanitizeNumbers', () => {
     expect(GoogleSheets.sanitizeNumbers([[1], [2], [0]])).toEqual([1, 2, 0]);
-    expect(GoogleSheets.sanitizeNumbers([[100.0], [1000.23], ,])).toEqual([100, 1000.23]);
+    expect(GoogleSheets.sanitizeNumbers([[100.0], [1000.23], ,])).toEqual([
+      100,
+      1000.23,
+    ]);
     // We need to "trick" the number conversion otherwise we get type checked and our test won't throw
-    expect(() => GoogleSheets.sanitizeNumbers([[1], [Number('foo')], ,])).toThrow();
+    expect(() =>
+      GoogleSheets.sanitizeNumbers([[1], [Number('foo')], ,]),
+    ).toThrow();
   });
 
   test('profitLogMsg', () => {
@@ -356,7 +381,11 @@ describe('GoogleSheets', () => {
       const stats = {
         startDate: new DateUtils.CalendarDate(2020, 1, 1),
         endDate: new DateUtils.CalendarDate(2020, 1, 2),
-        dates: [[new Date(2020, 0, 1)], [new Date(2020, 0, 1)], [new Date(2020, 0, 2)]],
+        dates: [
+          [new Date(2020, 0, 1)],
+          [new Date(2020, 0, 1)],
+          [new Date(2020, 0, 2)],
+        ],
         tickers: [['foo1'], ['foo2'], ['foo1']],
         operations: [['buy'], ['buy'], ['sell']],
         quantities: [[100], [100], [100]],
@@ -392,7 +421,11 @@ describe('GoogleSheets', () => {
       const stats = {
         startDate: new DateUtils.CalendarDate(2020, 1, 1),
         endDate: new DateUtils.CalendarDate(2020, 1, 3),
-        dates: [[new Date(2020, 0, 1)], [new Date(2020, 0, 2)], [new Date(2020, 0, 3)]],
+        dates: [
+          [new Date(2020, 0, 1)],
+          [new Date(2020, 0, 2)],
+          [new Date(2020, 0, 3)],
+        ],
         tickers: [['foo1'], ['foo1'], ['foo1']],
         operations: [['buy'], ['sell'], ['buy']],
         quantities: [[100], [100], [1000]],

@@ -1,10 +1,10 @@
 import faker from 'faker';
 
-import { DateUtils } from 'src/utils/date';
-import { NumberUtils } from 'src/utils/number';
-import { Types } from 'src/utils/types';
+import { CalendarDate } from './utils/date';
+import { toFixed } from './utils/number';
+import type { Operation } from './utils/types';
 
-import { Finance } from './finance';
+import { Portfolio, Transaction, statsFrom } from './finance';
 
 describe('Portfolio', () => {
   test('The averagePrice behaves as expected after successive buy operations', () => {
@@ -16,43 +16,43 @@ describe('Portfolio', () => {
     const ticker = faker.random.word().toLowerCase();
     const noop = (): void => {};
 
-    const portfolio = new Finance.Portfolio(noop, noop);
+    const portfolio = new Portfolio(noop, noop);
 
     portfolio.add(
-      new Finance.Transaction({
-        date: new DateUtils.CalendarDate(2020, 1, 1),
+      new Transaction({
+        date: new CalendarDate(2020, 1, 1),
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: 100,
         total: 921.5,
       }),
     );
 
-    expect(NumberUtils.toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(9.22);
+    expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(9.22);
 
     portfolio.add(
-      new Finance.Transaction({
-        date: new DateUtils.CalendarDate(2020, 1, 2),
+      new Transaction({
+        date: new CalendarDate(2020, 1, 2),
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: 100,
         total: 1221.7,
       }),
     );
 
-    expect(NumberUtils.toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(10.72);
+    expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(10.72);
 
     portfolio.add(
-      new Finance.Transaction({
-        date: new DateUtils.CalendarDate(2020, 1, 3),
+      new Transaction({
+        date: new CalendarDate(2020, 1, 3),
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: 200,
         total: 3023.6,
       }),
     );
 
-    expect(NumberUtils.toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(12.92);
+    expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(12.92);
   });
 
   test('The averagePrice behaves as expected after buy and sell operations', () => {
@@ -64,53 +64,53 @@ describe('Portfolio', () => {
     const ticker = faker.random.word().toLocaleLowerCase();
     const fn = (): void => {};
 
-    const portfolio = new Finance.Portfolio(fn, fn);
+    const portfolio = new Portfolio(fn, fn);
 
     portfolio.add(
-      new Finance.Transaction({
-        date: new DateUtils.CalendarDate(2020, 1, 1),
+      new Transaction({
+        date: new CalendarDate(2020, 1, 1),
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: 100,
         total: 921.5,
       }),
     );
 
-    expect(NumberUtils.toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(9.22);
+    expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(9.22);
 
     portfolio.add(
-      new Finance.Transaction({
-        date: new DateUtils.CalendarDate(2020, 1, 2),
+      new Transaction({
+        date: new CalendarDate(2020, 1, 2),
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: 100,
         total: 1221.7,
       }),
     );
 
-    expect(NumberUtils.toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(10.72);
+    expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(10.72);
 
     portfolio.add(
-      new Finance.Transaction({
-        date: new DateUtils.CalendarDate(2020, 1, 3),
+      new Transaction({
+        date: new CalendarDate(2020, 1, 3),
         ticker,
-        operation: 'sell' as Types.Operation,
+        operation: 'sell' as Operation,
         quantity: 50,
         total: faker.random.number(),
       }),
     );
 
     portfolio.add(
-      new Finance.Transaction({
-        date: new DateUtils.CalendarDate(2020, 1, 4),
+      new Transaction({
+        date: new CalendarDate(2020, 1, 4),
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: 200,
         total: 3023.6,
       }),
     );
 
-    expect(NumberUtils.toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(13.23);
+    expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(13.23);
   });
 });
 
@@ -118,7 +118,7 @@ describe('Transaction', () => {
   test('Throws when expected', () => {
     // Both ticker and date are not relevant for the tests
     const ticker = faker.random.word().toLowerCase();
-    const date = new DateUtils.CalendarDate(2020, 1, 1);
+    const date = new CalendarDate(2020, 1, 1);
 
     const validQuantity = faker.random.number({ min: 1 });
     const validTotal = faker.random.number({ min: 1 });
@@ -130,7 +130,7 @@ describe('Transaction', () => {
       {
         date,
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: validQuantity,
         total: validTotal,
         shouldThrow: false,
@@ -138,7 +138,7 @@ describe('Transaction', () => {
       {
         date,
         ticker,
-        operation: 'sell' as Types.Operation,
+        operation: 'sell' as Operation,
         quantity: validQuantity,
         total: validTotal,
         shouldThrow: false,
@@ -146,7 +146,7 @@ describe('Transaction', () => {
       {
         date,
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: invalidQuantity,
         total: validTotal,
         shouldThrow: true,
@@ -154,7 +154,7 @@ describe('Transaction', () => {
       {
         date,
         ticker,
-        operation: 'sell' as Types.Operation,
+        operation: 'sell' as Operation,
         quantity: invalidQuantity,
         total: validTotal,
         shouldThrow: true,
@@ -162,7 +162,7 @@ describe('Transaction', () => {
       {
         date,
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: validQuantity,
         total: invalidTotal,
         shouldThrow: true,
@@ -170,7 +170,7 @@ describe('Transaction', () => {
       {
         date,
         ticker,
-        operation: 'sell' as Types.Operation,
+        operation: 'sell' as Operation,
         quantity: validQuantity,
         total: invalidTotal,
         shouldThrow: true,
@@ -178,7 +178,7 @@ describe('Transaction', () => {
       {
         date,
         ticker,
-        operation: 'buy' as Types.Operation,
+        operation: 'buy' as Operation,
         quantity: invalidQuantity,
         total: invalidTotal,
         shouldThrow: true,
@@ -186,7 +186,7 @@ describe('Transaction', () => {
       {
         date,
         ticker,
-        operation: 'sell' as Types.Operation,
+        operation: 'sell' as Operation,
         quantity: invalidQuantity,
         total: invalidTotal,
         shouldThrow: true,
@@ -195,9 +195,9 @@ describe('Transaction', () => {
 
     testCases.forEach(({ shouldThrow, ...t }) => {
       if (shouldThrow) {
-        expect(() => new Finance.Transaction(t)).toThrow();
+        expect(() => new Transaction(t)).toThrow();
       } else {
-        expect(() => new Finance.Transaction(t)).not.toThrow();
+        expect(() => new Transaction(t)).not.toThrow();
       }
     });
   });
@@ -214,21 +214,21 @@ describe('statsFrom', () => {
 
     const args = {
       transactions: [
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 1),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 1),
           ticker,
-          operation: 'buy' as Types.Operation,
+          operation: 'buy' as Operation,
           quantity,
           total,
         }),
       ],
-      startDate: new DateUtils.CalendarDate(2020, 1, 1),
-      endDate: new DateUtils.CalendarDate(2020, 1, 31),
+      startDate: new CalendarDate(2020, 1, 1),
+      endDate: new CalendarDate(2020, 1, 31),
       onPurchase: jest.fn(),
       onSell: jest.fn(),
     };
 
-    Finance.statsFrom(args);
+    statsFrom(args);
 
     expect(args.onPurchase).toHaveBeenCalledTimes(1);
     expect(args.onSell).not.toHaveBeenCalled();
@@ -236,20 +236,20 @@ describe('statsFrom', () => {
     args.onPurchase.mockReset();
     args.onSell.mockReset();
 
-    Finance.statsFrom({
+    statsFrom({
       ...args,
       transactions: [
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 1),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 1),
           ticker,
-          operation: 'buy' as Types.Operation,
+          operation: 'buy' as Operation,
           quantity,
           total,
         }),
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 2),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 2),
           ticker,
-          operation: 'buy' as Types.Operation,
+          operation: 'buy' as Operation,
           quantity,
           total,
         }),
@@ -262,20 +262,20 @@ describe('statsFrom', () => {
     args.onPurchase.mockReset();
     args.onSell.mockReset();
 
-    Finance.statsFrom({
+    statsFrom({
       ...args,
       transactions: [
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 1),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 1),
           ticker,
-          operation: 'buy' as Types.Operation,
+          operation: 'buy' as Operation,
           quantity,
           total,
         }),
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 2),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 2),
           ticker,
-          operation: 'sell' as Types.Operation,
+          operation: 'sell' as Operation,
           quantity,
           total,
         }),
@@ -292,28 +292,28 @@ describe('statsFrom', () => {
 
     const args = {
       transactions: [
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 1),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 1),
           ticker,
-          operation: 'sell' as Types.Operation,
+          operation: 'sell' as Operation,
           quantity,
           total: faker.random.number({ min: 1 }),
         }),
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 2),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 2),
           ticker,
-          operation: 'buy' as Types.Operation,
+          operation: 'buy' as Operation,
           quantity,
           total: faker.random.number({ min: 1 }),
         }),
       ],
-      startDate: new DateUtils.CalendarDate(2020, 1, 1),
-      endDate: new DateUtils.CalendarDate(2020, 1, 2),
+      startDate: new CalendarDate(2020, 1, 1),
+      endDate: new CalendarDate(2020, 1, 2),
       onPurchase: jest.fn(),
       onSell: jest.fn(),
     };
 
-    expect(() => Finance.statsFrom(args)).toThrow();
+    expect(() => statsFrom(args)).toThrow();
 
     expect(args.onPurchase).not.toHaveBeenCalled();
     expect(args.onSell).not.toHaveBeenCalled();
@@ -324,28 +324,28 @@ describe('statsFrom', () => {
 
     const args = {
       transactions: [
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 1),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 1),
           ticker,
-          operation: 'buy' as Types.Operation,
+          operation: 'buy' as Operation,
           quantity: 1,
           total: faker.random.number({ min: 1 }),
         }),
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 2),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 2),
           ticker,
-          operation: 'sell' as Types.Operation,
+          operation: 'sell' as Operation,
           quantity: 2,
           total: faker.random.number({ min: 1 }),
         }),
       ],
-      startDate: new DateUtils.CalendarDate(2020, 1, 1),
-      endDate: new DateUtils.CalendarDate(2020, 1, 2),
+      startDate: new CalendarDate(2020, 1, 1),
+      endDate: new CalendarDate(2020, 1, 2),
       onPurchase: jest.fn(),
       onSell: jest.fn(),
     };
 
-    expect(() => Finance.statsFrom(args)).toThrow();
+    expect(() => statsFrom(args)).toThrow();
 
     expect(args.onPurchase).toHaveBeenCalledTimes(1);
     expect(args.onSell).not.toHaveBeenCalled();
@@ -356,28 +356,28 @@ describe('statsFrom', () => {
 
     const args = {
       transactions: [
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 1),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 1),
           ticker: 'foo1',
-          operation: 'buy' as Types.Operation,
+          operation: 'buy' as Operation,
           quantity,
           total: faker.random.number({ min: 1 }),
         }),
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 2),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 2),
           ticker: 'foo2',
-          operation: 'sell' as Types.Operation,
+          operation: 'sell' as Operation,
           quantity,
           total: faker.random.number({ min: 1 }),
         }),
       ],
-      startDate: new DateUtils.CalendarDate(2020, 1, 1),
-      endDate: new DateUtils.CalendarDate(2020, 1, 2),
+      startDate: new CalendarDate(2020, 1, 1),
+      endDate: new CalendarDate(2020, 1, 2),
       onPurchase: jest.fn(),
       onSell: jest.fn(),
     };
 
-    expect(() => Finance.statsFrom(args)).toThrow();
+    expect(() => statsFrom(args)).toThrow();
 
     expect(args.onPurchase).toHaveBeenCalledTimes(1);
     expect(args.onSell).not.toHaveBeenCalled();
@@ -389,28 +389,28 @@ describe('statsFrom', () => {
 
     const args = {
       transactions: [
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 1),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 1),
           ticker,
-          operation: 'buy' as Types.Operation,
+          operation: 'buy' as Operation,
           quantity,
           total: faker.random.number({ min: 1 }),
         }),
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 2),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 2),
           ticker,
-          operation: 'sell' as Types.Operation,
+          operation: 'sell' as Operation,
           quantity,
           total: faker.random.number({ min: 1 }),
         }),
       ],
-      startDate: new DateUtils.CalendarDate(2020, 1, 1),
-      endDate: new DateUtils.CalendarDate(2020, 1, 1),
+      startDate: new CalendarDate(2020, 1, 1),
+      endDate: new CalendarDate(2020, 1, 1),
       onPurchase: jest.fn(),
       onSell: jest.fn(),
     };
 
-    Finance.statsFrom(args);
+    statsFrom(args);
 
     expect(args.onPurchase).toHaveBeenCalledTimes(1);
     expect(args.onSell).not.toHaveBeenCalled();
@@ -422,28 +422,28 @@ describe('statsFrom', () => {
 
     const args = {
       transactions: [
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 1),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 1),
           ticker,
-          operation: 'buy' as Types.Operation,
+          operation: 'buy' as Operation,
           quantity,
           total: faker.random.number({ min: 1 }),
         }),
-        new Finance.Transaction({
-          date: new DateUtils.CalendarDate(2020, 1, 2),
+        new Transaction({
+          date: new CalendarDate(2020, 1, 2),
           ticker,
-          operation: 'sell' as Types.Operation,
+          operation: 'sell' as Operation,
           quantity,
           total: faker.random.number({ min: 1 }),
         }),
       ],
-      startDate: new DateUtils.CalendarDate(2020, 1, 3),
-      endDate: new DateUtils.CalendarDate(2020, 1, 3),
+      startDate: new CalendarDate(2020, 1, 3),
+      endDate: new CalendarDate(2020, 1, 3),
       onPurchase: jest.fn(),
       onSell: jest.fn(),
     };
 
-    Finance.statsFrom(args);
+    statsFrom(args);
 
     expect(args.onPurchase).not.toHaveBeenCalled();
     expect(args.onSell).not.toHaveBeenCalled();
