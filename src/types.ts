@@ -53,11 +53,3 @@ export type SpreadsheetFunction = {
   startDate: CalendarDate;
   endDate: CalendarDate;
 } & SpreadsheetTransaction;
-
-export type Portfolio = {
-  readonly stats: Stats;
-  readonly onPurchase?: OperationCallback;
-  readonly onSell?: OperationCallback;
-
-  add(t: Transaction): void;
-};
