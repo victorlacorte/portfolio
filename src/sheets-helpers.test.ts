@@ -1,29 +1,38 @@
-import * as DateUtils from 'src/utils/date';
+import { CalendarDate } from './utils/date';
 
-import * as GoogleSheets from './sheets-helpers';
+import {
+  makeTransactions,
+  profit,
+  profitLogMsg,
+  sameLength,
+  sanitizeDates,
+  sanitizeNumbers,
+  sanitizeOperations,
+  sanitizeTickers,
+  snapshot,
+  sanitizeSparseMatrix,
+} from './sheets-helpers';
 
-describe('GoogleSheets', () => {
+describe('Sheets helpers', () => {
   test('sanitizeSparseMatrix', () => {
-    expect(GoogleSheets.sanitizeSparseMatrix([[1], [2], , ,])).toEqual([1, 2]);
-    expect(GoogleSheets.sanitizeSparseMatrix([[1], [2], , [3]])).toEqual([
-      1,
-      2,
-      3,
+    expect(sanitizeSparseMatrix([[1], [2], , ,])).toEqual([1, 2]);
+    expect(sanitizeSparseMatrix([[1], [2], , [3]])).toEqual([1, 2, 3]);
+    expect(sanitizeSparseMatrix([['a'], ['b'], , ['c'], ['']])).toEqual([
+      'a',
+      'b',
+      'c',
     ]);
-    expect(
-      GoogleSheets.sanitizeSparseMatrix([['a'], ['b'], , ['c'], ['']]),
-    ).toEqual(['a', 'b', 'c']);
   });
 
   test('sameLength', () => {
-    expect(GoogleSheets.sameLength([1, 2], [3, 4])).toBe(true);
-    expect(GoogleSheets.sameLength([1, 2], [])).toBe(false);
-    expect(GoogleSheets.sameLength([1, 2], [3])).toBe(false);
+    expect(sameLength([1, 2], [3, 4])).toBe(true);
+    expect(sameLength([1, 2], [])).toBe(false);
+    expect(sameLength([1, 2], [3])).toBe(false);
   });
 
   describe('makeTransactions', () => {
     test('Creates a single transaction', () => {
-      const t = GoogleSheets.makeTransactions({
+      const t = makeTransactions({
         dates: [[new Date(2020, 0, 1)]],
         tickers: [['foo1']],
         operations: [['buy']],
@@ -56,11 +65,11 @@ describe('GoogleSheets', () => {
         taxDeductions: [[0], [1]],
       };
 
-      expect(() => GoogleSheets.makeTransactions(t)).toThrow();
+      expect(() => makeTransactions(t)).toThrow();
     });
 
     test('Creates two transactions', () => {
-      const t = GoogleSheets.makeTransactions({
+      const t = makeTransactions({
         dates: [[new Date(2020, 0, 1)], [new Date(2020, 0, 2)]],
         tickers: [['foo1'], ['foo1']],
         operations: [['buy'], ['sell']],
@@ -93,7 +102,7 @@ describe('GoogleSheets', () => {
     });
 
     test('Creates transactions without taxDeductions', () => {
-      const t = GoogleSheets.makeTransactions({
+      const t = makeTransactions({
         dates: [[new Date(2020, 0, 1)], [new Date(2020, 0, 2)]],
         tickers: [['foo1'], ['foo1']],
         operations: [['buy'], ['buy']],
@@ -127,50 +136,29 @@ describe('GoogleSheets', () => {
 
   test('sanitizeDates', () => {
     expect(
-      GoogleSheets.sanitizeDates([
-        [new Date(2020, 0, 1)],
-        [new Date(2020, 0, 1)],
-        ,
-        ,
-      ]),
-    ).toEqual([
-      new DateUtils.CalendarDate(2020, 1, 1),
-      new DateUtils.CalendarDate(2020, 1, 1),
-    ]);
+      sanitizeDates([[new Date(2020, 0, 1)], [new Date(2020, 0, 1)], , ,]),
+    ).toEqual([new CalendarDate(2020, 1, 1), new CalendarDate(2020, 1, 1)]);
   });
 
   test('sanitizeTickers', () => {
-    expect(GoogleSheets.sanitizeTickers([['foo1'], ['foo2'], ,])).toEqual([
-      'foo1',
-      'foo2',
-    ]);
+    expect(sanitizeTickers([['foo1'], ['foo2'], ,])).toEqual(['foo1', 'foo2']);
   });
 
   test('sanitizeOperations', () => {
-    expect(GoogleSheets.sanitizeOperations([['buy'], ['sell'], ,])).toEqual([
-      'buy',
-      'sell',
-    ]);
-    expect(() =>
-      GoogleSheets.sanitizeOperations([['buy'], ['foo'], ,]),
-    ).toThrow();
+    expect(sanitizeOperations([['buy'], ['sell'], ,])).toEqual(['buy', 'sell']);
+    expect(() => sanitizeOperations([['buy'], ['foo'], ,])).toThrow();
   });
 
   test('sanitizeNumbers', () => {
-    expect(GoogleSheets.sanitizeNumbers([[1], [2], [0]])).toEqual([1, 2, 0]);
-    expect(GoogleSheets.sanitizeNumbers([[100.0], [1000.23], ,])).toEqual([
-      100,
-      1000.23,
-    ]);
+    expect(sanitizeNumbers([[1], [2], [0]])).toEqual([1, 2, 0]);
+    expect(sanitizeNumbers([[100.0], [1000.23], ,])).toEqual([100, 1000.23]);
     // We need to "trick" the number conversion otherwise we get type checked and our test won't throw
-    expect(() =>
-      GoogleSheets.sanitizeNumbers([[1], [Number('foo')], ,]),
-    ).toThrow();
+    expect(() => sanitizeNumbers([[1], [Number('foo')], ,])).toThrow();
   });
 
   test('profitLogMsg', () => {
     const stats = {
-      date: new DateUtils.CalendarDate(2020, 1, 1),
+      date: new CalendarDate(2020, 1, 1),
       ticker: 'foo1',
       quantity: 100,
       total: 1000,
@@ -178,7 +166,7 @@ describe('GoogleSheets', () => {
       profit: 10,
       taxDeduction: 1,
     };
-    expect(GoogleSheets.profitLogMsg(stats)).toMatchInlineSnapshot(
+    expect(profitLogMsg(stats)).toMatchInlineSnapshot(
       `"2020/01/01: [FOO1] quantity=100, total=1,000.00, profit=10.00 (1.11%), tax=1.00"`,
     );
   });
@@ -186,8 +174,8 @@ describe('GoogleSheets', () => {
   describe('profit', () => {
     test('A single buy transaction, so no profit', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 1),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 1),
         dates: [[new Date(2020, 0, 1)]],
         tickers: [['foo1']],
         operations: [['buy']],
@@ -196,7 +184,7 @@ describe('GoogleSheets', () => {
         taxDeductions: [[0]],
       };
 
-      expect(GoogleSheets.profit(stats)).toMatchInlineSnapshot(`
+      expect(profit(stats)).toMatchInlineSnapshot(`
         Object {
           "log": "",
           "profit": 0,
@@ -208,8 +196,8 @@ describe('GoogleSheets', () => {
 
     test('A couple of buy transactions, so no profit', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 2),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1), new Date(2020, 0, 1)]],
         tickers: [['foo1', 'foo1']],
         operations: [['buy', 'buy']],
@@ -218,7 +206,7 @@ describe('GoogleSheets', () => {
         taxDeductions: [[0, 0]],
       };
 
-      expect(GoogleSheets.profit(stats)).toMatchInlineSnapshot(`
+      expect(profit(stats)).toMatchInlineSnapshot(`
         Object {
           "log": "",
           "profit": 0,
@@ -230,8 +218,8 @@ describe('GoogleSheets', () => {
 
     test('Buy and sell transactions, but 0 profit', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 2),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1), new Date(2020, 0, 1)]],
         tickers: [['foo1', 'foo1']],
         operations: [['buy', 'sell']],
@@ -240,7 +228,7 @@ describe('GoogleSheets', () => {
         taxDeductions: [[0, 1]],
       };
 
-      expect(GoogleSheets.profit(stats)).toMatchInlineSnapshot(`
+      expect(profit(stats)).toMatchInlineSnapshot(`
         Object {
           "log": "2020/01/01: [FOO1] quantity=100, total=1,000.00, profit=0.00 (0%), tax=1.00",
           "profit": 0,
@@ -252,8 +240,8 @@ describe('GoogleSheets', () => {
 
     test('Buy and sell transactions, with profit', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 2),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1), new Date(2020, 0, 1)]],
         tickers: [['foo1', 'foo1']],
         operations: [['buy', 'sell']],
@@ -262,7 +250,7 @@ describe('GoogleSheets', () => {
         taxDeductions: [[0, 1]],
       };
 
-      expect(GoogleSheets.profit(stats)).toMatchInlineSnapshot(`
+      expect(profit(stats)).toMatchInlineSnapshot(`
         Object {
           "log": "2020/01/01: [FOO1] quantity=100, total=1,100.00, profit=100.00 (10%), tax=1.00",
           "profit": 100,
@@ -274,8 +262,8 @@ describe('GoogleSheets', () => {
 
     test('Sell transaction with no tax deduction', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 2),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1), new Date(2020, 0, 1)]],
         tickers: [['foo1', 'foo1']],
         operations: [['buy', 'sell']],
@@ -284,15 +272,15 @@ describe('GoogleSheets', () => {
         taxDeductions: [[0, 0]],
       };
 
-      expect(() => GoogleSheets.profit(stats)).toThrow();
+      expect(() => profit(stats)).toThrow();
     });
   });
 
   describe('snapshot', () => {
     test('Opens a position with a single ticker', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 1),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 1),
         dates: [[new Date(2020, 0, 1)]],
         tickers: [['foo1']],
         operations: [['buy']],
@@ -300,7 +288,7 @@ describe('GoogleSheets', () => {
         totals: [[1000]],
       };
 
-      expect(GoogleSheets.snapshot(stats)).toMatchInlineSnapshot(`
+      expect(snapshot(stats)).toMatchInlineSnapshot(`
         Array [
           Object {
             "averagePrice": 10,
@@ -317,8 +305,8 @@ describe('GoogleSheets', () => {
 
     test('Opens a position with different tickers', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 2),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1)], [new Date(2020, 0, 2)]],
         tickers: [['foo1'], ['foo2']],
         operations: [['buy'], ['buy']],
@@ -326,7 +314,7 @@ describe('GoogleSheets', () => {
         totals: [[1000], [5000]],
       };
 
-      expect(GoogleSheets.snapshot(stats)).toMatchInlineSnapshot(`
+      expect(snapshot(stats)).toMatchInlineSnapshot(`
         Array [
           Object {
             "averagePrice": 10,
@@ -352,8 +340,8 @@ describe('GoogleSheets', () => {
 
     test('Opens and closes a position', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 2),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1)], [new Date(2020, 0, 2)]],
         tickers: [['foo1'], ['foo1']],
         operations: [['buy'], ['sell']],
@@ -361,7 +349,7 @@ describe('GoogleSheets', () => {
         totals: [[1000], [1100]],
       };
 
-      expect(GoogleSheets.snapshot(stats)).toMatchInlineSnapshot(`
+      expect(snapshot(stats)).toMatchInlineSnapshot(`
         Array [
           Object {
             "averagePrice": "NA",
@@ -379,8 +367,8 @@ describe('GoogleSheets', () => {
 
     test('Opens a position with different tickers, then closes one of them', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 2),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 2),
         dates: [
           [new Date(2020, 0, 1)],
           [new Date(2020, 0, 1)],
@@ -392,7 +380,7 @@ describe('GoogleSheets', () => {
         totals: [[1000], [3000], [500]],
       };
 
-      expect(GoogleSheets.snapshot(stats)).toMatchInlineSnapshot(`
+      expect(snapshot(stats)).toMatchInlineSnapshot(`
         Array [
           Object {
             "averagePrice": "NA",
@@ -419,8 +407,8 @@ describe('GoogleSheets', () => {
 
     test('Opens and closes a position, then reopens it', () => {
       const stats = {
-        startDate: new DateUtils.CalendarDate(2020, 1, 1),
-        endDate: new DateUtils.CalendarDate(2020, 1, 3),
+        startDate: new CalendarDate(2020, 1, 1),
+        endDate: new CalendarDate(2020, 1, 3),
         dates: [
           [new Date(2020, 0, 1)],
           [new Date(2020, 0, 2)],
@@ -432,7 +420,7 @@ describe('GoogleSheets', () => {
         totals: [[1000], [1100], [20000]],
       };
 
-      expect(GoogleSheets.snapshot(stats)).toMatchInlineSnapshot(`
+      expect(snapshot(stats)).toMatchInlineSnapshot(`
         Array [
           Object {
             "averagePrice": 20,

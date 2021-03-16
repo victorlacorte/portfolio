@@ -1,8 +1,14 @@
 import { CalendarDate } from './utils/date';
-import * as LoggingUtils from './utils/logging';
-import * as Messages from './utils/messages';
-import * as NumberUtils from './utils/number';
-import { operations } from './utils/constants';
+import Logger from './utils/logging';
+import {
+  expectedFinite,
+  expectedPostive,
+  expectedReceived,
+  diffLengthNR,
+} from './utils/messages';
+import { div, format, mul, sub, toCurrency, toFixed } from './utils/number';
+import { operations } from './constants';
+import { statsFrom, Transaction as FinanceTransaction } from './finance';
 import type {
   CalendarDate as CalendarDateType,
   Operation,
@@ -10,8 +16,7 @@ import type {
   SpreadsheetFunction,
   SpreadsheetTransaction,
   Stats,
-} from './utils/types';
-import { statsFrom, Transaction as FinanceTransaction } from './finance';
+} from './types';
 
 export function sanitizeSparseMatrix<T>(arr: T[][]): T[] {
   return arr.flat().filter((val) => val !== undefined && val.toString().length);
@@ -30,7 +35,7 @@ export function sanitizeDates(dates: Date[][]): CalendarDateType[] {
 export function sanitizeTickers(tickers: string[][]): string[] {
   return sanitizeSparseMatrix(tickers).map((t, idx) => {
     if (typeof t !== 'string') {
-      throw new Error(Messages.expectedReceived('a string', t, idx + 1));
+      throw new Error(expectedReceived('a string', t, idx + 1));
     }
     return t;
   });
@@ -41,9 +46,7 @@ export function sanitizeOperations(x: string[][]): Operation[] {
     const valid = op.toLowerCase() as Operation;
 
     if (!operations.includes(valid)) {
-      throw new Error(
-        Messages.expectedReceived(`[${operations}]`, op, idx + 1),
-      );
+      throw new Error(expectedReceived(`[${operations}]`, op, idx + 1));
     }
 
     return valid;
@@ -53,7 +56,7 @@ export function sanitizeOperations(x: string[][]): Operation[] {
 export function sanitizeNumbers(numbers: number[][]): number[] {
   return sanitizeSparseMatrix(numbers).map((n, idx) => {
     if (!isFinite(n)) {
-      throw new Error(Messages.expectedFinite(n, idx + 1));
+      throw new Error(expectedFinite(n, idx + 1));
     }
     return n;
   });
@@ -94,7 +97,7 @@ export function makeTransactions({
       _taxDeductions,
     )
   ) {
-    throw new Error(Messages.diffLengthNR);
+    throw new Error(diffLengthNR);
   }
 
   return _dates.map(
@@ -125,15 +128,12 @@ export function profitLogMsg({
   taxDeduction,
 }: ProfitLogMsg): string {
   const parsedTicker = ticker.toUpperCase();
-  const parsedQuantity = NumberUtils.format(quantity);
-  const parsedTotal = NumberUtils.toCurrency(total);
-  const parsedProfit = NumberUtils.toCurrency(profit);
-  const parsedTaxDeduction = NumberUtils.toCurrency(taxDeduction);
+  const parsedQuantity = format(quantity);
+  const parsedTotal = toCurrency(total);
+  const parsedProfit = toCurrency(profit);
+  const parsedTaxDeduction = toCurrency(taxDeduction);
 
-  const profitPercent = NumberUtils.toFixed(
-    NumberUtils.div(profit, purchasedValue) * 100,
-    2,
-  );
+  const profitPercent = toFixed(div(profit, purchasedValue) * 100, 2);
 
   return `${date}: [${parsedTicker}] quantity=${parsedQuantity}, total=${parsedTotal}, profit=${parsedProfit} (${profitPercent}%), tax=${parsedTaxDeduction}`;
 }
@@ -148,8 +148,8 @@ export function snapshotLogMsg({
   total,
 }: Omit<TransactionType, 'ticker'>): string {
   const parsedOperation = operation.toUpperCase();
-  const parsedTotal = NumberUtils.toCurrency(total);
-  const averagePrice = NumberUtils.toCurrency(NumberUtils.div(total, quantity));
+  const parsedTotal = toCurrency(total);
+  const averagePrice = toCurrency(div(total, quantity));
 
   return `${date}: [${parsedOperation}] ${quantity} stocks for ${parsedTotal} (${averagePrice})`;
 }
@@ -171,23 +171,23 @@ export function profit({
   let total = 0;
   let profit = 0;
   let taxDeduction = 0;
-  const logger = new LoggingUtils.Logger();
+  const logger = new Logger();
 
   function handleSell(transaction: TransactionType, stats: Stats): void {
     if (!transaction.taxDeduction || transaction.taxDeduction <= 0) {
-      throw new Error(Messages.expectedPostive(transaction.taxDeduction));
+      throw new Error(expectedPostive(transaction.taxDeduction));
     }
 
     if (
       transaction.date.year === endDate.year &&
       transaction.date.month === endDate.month
     ) {
-      const purchasedValue = NumberUtils.mul(
+      const purchasedValue = mul(
         transaction.quantity,
         stats[transaction.ticker].averagePrice,
       );
 
-      const currProfit = NumberUtils.sub(transaction.total, purchasedValue);
+      const currProfit = sub(transaction.total, purchasedValue);
 
       total += transaction.total;
       profit += currProfit;
@@ -241,11 +241,11 @@ export function snapshot({
 }: SpreadsheetFunction): SnapshotReturn[] {
   const transactions = makeTransactions(transactionParams);
 
-  const control: { [ticker: string]: LoggingUtils.Logger } = {};
+  const control: { [ticker: string]: Logger } = {};
 
   function handleOperation(transaction: TransactionType): void {
     if (!Object.prototype.hasOwnProperty.call(control, transaction.ticker)) {
-      control[transaction.ticker] = new LoggingUtils.Logger();
+      control[transaction.ticker] = new Logger();
     }
 
     control[transaction.ticker].add(snapshotLogMsg(transaction));
