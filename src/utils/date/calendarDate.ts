@@ -1,14 +1,10 @@
 import { padStart } from 'src/utils/number';
-import type { CalendarDate as CalendarDateType } from 'src/utils/types';
+import type { CalendarDate as _CalendarDate } from 'src/types';
 
-/**
- * TODO we could have Month and Day types: would it help, though? We already
- * validate CalendarDates upon construction.
- */
 /**
  * YYYY/MM/DD convention
  */
-export class CalendarDate implements CalendarDateType {
+export default class CalendarDate implements _CalendarDate {
   private readonly _year: number;
   private readonly _month: number;
   private readonly _day: number;
@@ -58,6 +54,7 @@ export class CalendarDate implements CalendarDateType {
     if (this.toJSDate().getUTCDate() !== this.day) {
       return false;
     }
+
     return true;
   }
 
@@ -71,25 +68,5 @@ export class CalendarDate implements CalendarDateType {
       d = padStart(this.day, 2);
 
     return `${y}/${m}/${d}`;
-  }
-}
-
-// https://jsperf.com/days-in-month-perf-test/6
-// https://www.ecma-international.org/ecma-262/10.0/index.html#eqn-DaysInYear
-/**
- * Pay attention to the leaping year definition
- * @param month 1 indexed: 1-12
- */
-export function daysIn(year: number, month: number): 28 | 29 | 30 | 31 {
-  switch (month) {
-    case 2:
-      return (year % 4 == 0 && year % 100) || year % 400 == 0 ? 29 : 28;
-    case 4:
-    case 6:
-    case 9:
-    case 11:
-      return 30;
-    default:
-      return 31;
   }
 }
