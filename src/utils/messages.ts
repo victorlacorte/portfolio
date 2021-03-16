@@ -12,10 +12,10 @@ export const expectedReceived = (
   return line ? `[Line ${line}] ${msg}` : msg;
 };
 
-export const expectedPostiveOrZero = (n: number, line?: number): string =>
+export const expectedPositiveOrZero = (n: number, line?: number): string =>
   expectedReceived('a positive number or zero', n, line);
 
-export const expectedPostive = (n: number, line?: number): string =>
+export const expectedPositive = (n: number, line?: number): string =>
   expectedReceived('a positive number', n, line);
 
 export const expectedFinite = (n: number, line?: number): string =>

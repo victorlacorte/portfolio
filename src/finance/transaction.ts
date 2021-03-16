@@ -1,4 +1,4 @@
-import { expectedPostive, expectedPostiveOrZero } from 'src/utils/messages';
+import { expectedPositive, expectedPositiveOrZero } from 'src/utils/messages';
 import type {
   CalendarDate,
   Operation,
@@ -27,15 +27,15 @@ export default class Transaction implements _Transaction {
     taxDeduction,
   }: _Transaction) {
     if (!Number.isInteger(quantity) || quantity <= 0) {
-      throw new Error(expectedPostive(quantity));
+      throw new Error(expectedPositive(quantity));
     }
 
     if (total < 0) {
-      throw new Error(expectedPostiveOrZero(total));
+      throw new Error(expectedPositiveOrZero(total));
     }
 
     if (isFinite(taxDeduction) && taxDeduction < 0) {
-      throw new Error(expectedPostiveOrZero(taxDeduction));
+      throw new Error(expectedPositiveOrZero(taxDeduction));
     }
 
     this._date = date;

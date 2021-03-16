@@ -2,7 +2,7 @@ import { CalendarDate } from './utils/date';
 import Logger from './utils/logging';
 import {
   expectedFinite,
-  expectedPostive,
+  expectedPositive,
   expectedReceived,
   diffLengthNR,
 } from './utils/messages';
@@ -176,7 +176,7 @@ export function profit({
 
   function handleSell(transaction: TransactionType, stats: Stats): void {
     if (!transaction.taxDeduction || transaction.taxDeduction <= 0) {
-      throw new Error(expectedPostive(transaction.taxDeduction));
+      throw new Error(expectedPositive(transaction.taxDeduction));
     }
 
     if (
