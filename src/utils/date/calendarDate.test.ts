@@ -20,9 +20,9 @@ describe('CalendarDate', () => {
 
   it('y = fromJSDate(x), y.toJSDate() === x, x: Date', () => {
     const dates = [
-      new Date(2020, 1, 1),
-      new Date(2020, 1, 2),
-      new Date(2020, 1, 10),
+      new Date('2020-01-01T03:00:00.000Z'),
+      new Date('2020-01-02T03:00:00.000Z'),
+      new Date('2020-01-10T03:00:00.000Z'),
     ];
 
     dates.forEach((date) => {
