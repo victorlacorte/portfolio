@@ -1,6 +1,9 @@
+import faker from 'faker';
+
 import { CalendarDate } from './utils/date';
 
 import {
+  irpfHelper,
   makeTransactions,
   profit,
   profitLogMsg,
@@ -8,10 +11,11 @@ import {
   sanitizeDates,
   sanitizeNumbers,
   sanitizeOperations,
+  sanitizeSparseMatrix,
   sanitizeTickers,
   snapshot,
-  sanitizeSparseMatrix,
 } from './sheets-helpers';
+import { statsFrom } from './finance';
 
 describe('Sheets helpers', () => {
   test('sanitizeSparseMatrix', () => {
@@ -352,13 +356,13 @@ describe('Sheets helpers', () => {
       expect(snapshot(stats)).toMatchInlineSnapshot(`
         Array [
           Object {
-            "averagePrice": "NA",
+            "averagePrice": 0,
             "log": "2020/01/01: [BUY] 100 stocks for 1,000.00 (10.00)
         2020/01/02: [SELL] 100 stocks for 1,100.00 (11.00)",
-            "purchasedQuantity": "NA",
-            "purchasedTotal": "NA",
-            "soldQuantity": "NA",
-            "soldTotal": "NA",
+            "purchasedQuantity": 0,
+            "purchasedTotal": 0,
+            "soldQuantity": 0,
+            "soldTotal": 0,
             "ticker": "foo1",
           },
         ]
@@ -383,13 +387,13 @@ describe('Sheets helpers', () => {
       expect(snapshot(stats)).toMatchInlineSnapshot(`
         Array [
           Object {
-            "averagePrice": "NA",
+            "averagePrice": 0,
             "log": "2020/01/01: [BUY] 100 stocks for 1,000.00 (10.00)
         2020/01/02: [SELL] 100 stocks for 500.00 (5.00)",
-            "purchasedQuantity": "NA",
-            "purchasedTotal": "NA",
-            "soldQuantity": "NA",
-            "soldTotal": "NA",
+            "purchasedQuantity": 0,
+            "purchasedTotal": 0,
+            "soldQuantity": 0,
+            "soldTotal": 0,
             "ticker": "foo1",
           },
           Object {
@@ -435,6 +439,118 @@ describe('Sheets helpers', () => {
           },
         ]
       `);
+    });
+  });
+
+  describe('irpfHelper', () => {
+    const baseYear = 2020;
+    const ticker = 'foo1';
+    const total = 100;
+
+    it('Opens and closes a position N years before `baseYear`', () => {
+      const stats = {
+        baseYear,
+        tickers: [[ticker, ticker]],
+        operations: [['buy', 'sell']],
+        quantities: [[100, 100]],
+        totals: [[total, total]],
+      };
+
+      for (let i = 2; i > 0; i--) {
+        const dates = [
+          [new Date(baseYear - i, 1, 1), new Date(baseYear - i, 1, 2)],
+        ];
+        const currStats = { ...stats, dates };
+
+        expect(irpfHelper(currStats)[ticker].ownedValuePrevYear).toBe(0);
+        expect(irpfHelper(currStats)[ticker].ownedValueCurrYear).toBe(0);
+      }
+    });
+
+    it('Opens a position N years before `baseYear`', () => {
+      const stats = {
+        baseYear,
+        tickers: [[ticker, ticker]],
+        operations: [['buy', 'buy']],
+        quantities: [[100, 100]],
+        totals: [[total, total]],
+      };
+
+      for (let i = 2; i > 0; i--) {
+        const dates = [
+          [new Date(baseYear - i, 1, 1), new Date(baseYear - i, 1, 2)],
+        ];
+        const currStats = { ...stats, dates };
+
+        expect(irpfHelper(currStats)[ticker].ownedValuePrevYear).toBe(
+          total * 2,
+        );
+        expect(irpfHelper(currStats)[ticker].ownedValueCurrYear).toBe(
+          total * 2,
+        );
+      }
+    });
+
+    it('Opens a position a year before `baseYear` and closes it in `baseYear`', () => {
+      const stats = {
+        baseYear,
+        dates: [[new Date(baseYear - 1, 1, 1), new Date(baseYear, 1, 1)]],
+        tickers: [[ticker, ticker]],
+        operations: [['buy', 'sell']],
+        quantities: [[100, 100]],
+        totals: [[total, total]],
+      };
+
+      expect(irpfHelper(stats)[ticker].ownedValuePrevYear).toBe(total);
+      expect(irpfHelper(stats)[ticker].ownedValueCurrYear).toBe(0);
+    });
+
+    it('Opens and closes a position a year before `baseYear`, then reopens it in `baseYear`', () => {
+      const stats = {
+        baseYear,
+        dates: [
+          [
+            new Date(baseYear - 1, 1, 1),
+            new Date(baseYear - 1, 1, 2),
+            new Date(baseYear, 1, 1),
+          ],
+        ],
+        tickers: [[ticker, ticker, ticker]],
+        operations: [['buy', 'sell', 'buy']],
+        quantities: [[100, 100, 100]],
+        totals: [[total, total, total]],
+      };
+
+      expect(irpfHelper(stats)[ticker].ownedValuePrevYear).toBe(0);
+      expect(irpfHelper(stats)[ticker].ownedValueCurrYear).toBe(total);
+    });
+
+    it('Opens a position a year before `baseYear`, then purchases again in `baseYear`', () => {
+      const stats = {
+        baseYear,
+        dates: [[new Date(baseYear - 1, 1, 1), new Date(baseYear, 1, 1)]],
+        tickers: [[ticker, ticker]],
+        operations: [['buy', 'buy']],
+        quantities: [[100, 100]],
+        totals: [[total, total]],
+      };
+
+      expect(irpfHelper(stats)[ticker].ownedValuePrevYear).toBe(total);
+      expect(irpfHelper(stats)[ticker].ownedValueCurrYear).toBe(total * 2);
+    });
+
+    it('Correctly considers the appropriate date interval', () => {
+      const stats = {
+        baseYear,
+        dates: [[new Date(baseYear, 1, 1), new Date(baseYear + 1, 1, 1)]],
+        tickers: [[ticker, ticker]],
+        operations: [['buy', 'buy']],
+        quantities: [[100, 100]],
+        totals: [[total, total]],
+      };
+
+      expect(irpfHelper(stats)[ticker].ownedValuePrevYear).toBe(0);
+      expect(irpfHelper(stats)[ticker].ownedValueCurrYear).toBe(total);
     });
   });
 });

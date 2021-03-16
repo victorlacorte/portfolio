@@ -11,6 +11,7 @@ import { operations } from './constants';
 import { statsFrom, Transaction as FinanceTransaction } from './finance';
 import type {
   CalendarDate as CalendarDateType,
+  Logger as _Logger,
   Operation,
   Transaction as TransactionType,
   SpreadsheetFunction,
@@ -284,17 +285,14 @@ export function snapshot({
   });
 }
 
-type IrpfInput = { year: number } & SpreadsheetTransaction;
+type IrpfInput = { baseYear: number } & SpreadsheetTransaction;
 type IrpfOutput = {
   ticker: string;
   ownedValuePrevYear: number;
   ownedValueCurrYear: number;
-  log: string;
+  log: _Logger;
 };
-export function irpfHelper({
-  year,
-  ...transactionParams
-}: IrpfInput): IrpfOutput[] {
+export function irpfHelper({ baseYear, ...transactionParams }: IrpfInput) {
   /**
    * What should be in the returned array?
    *
@@ -320,26 +318,49 @@ export function irpfHelper({
   //   control[transaction.ticker].add(snapshotLogMsg(transaction));
   // }
 
-  function handlePurchase(purchase: TransactionType): void {
+  // TODO naive attempt: taxDeductions not considered
+  function handleOperation(purchase: TransactionType, stats: Stats): void {
     const { ticker, date, quantity, total } = purchase;
+
     if (!Object.prototype.hasOwnProperty.call(control, ticker)) {
-      if (date.year <= year) {
-        control[ticker] = {
-          log: new LoggingUtils.Logger(),
-          ownedValuePrevYear: quantity * total,
-          ownedValueCurrYear: 0,
-        };
-      }
+      control[ticker] = {
+        log: new Logger(),
+        ownedValuePrevYear: 0,
+        ownedValueCurrYear: 0,
+      };
+    }
+
+    control[ticker].log.add(snapshotLogMsg(purchase));
+
+    const ownedValue = sub(
+      stats[ticker].purchased.total,
+      stats[ticker].sold.total,
+    );
+
+    if (date.year < baseYear) {
+      control[ticker].ownedValuePrevYear = ownedValue;
+      control[ticker].ownedValueCurrYear = ownedValue;
+    } else if (date.year == baseYear) {
+      control[ticker].ownedValueCurrYear = ownedValue;
     }
   }
 
-  function handleSell(sell: TransactionType): void {}
-
-  const stats = statsFrom({
+  statsFrom({
     startDate: new CalendarDate(1900, 1, 1),
-    endDate: new CalendarDate(year, 12, 31),
+    endDate: new CalendarDate(baseYear, 12, 31),
     transactions,
     onPurchase: handleOperation,
     onSell: handleOperation,
   });
+
+  return control;
+
+  // return Object.entries(
+  //   control,
+  // ).map(([key, { log, ownedValueCurrYear, ownedValuePrevYear }]) => [
+  //   key,
+  //   ownedValuePrevYear,
+  //   ownedValueCurrYear,
+  //   log,
+  // ]);
 }
