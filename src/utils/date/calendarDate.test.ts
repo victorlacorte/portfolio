@@ -27,7 +27,7 @@ describe('CalendarDate', () => {
 
     dates.forEach((date) => {
       const cd = CalendarDate.fromJSDate(date);
-      expect(cd.toJSDate()).toBe(date);
+      expect(cd.toJSDate()).toStrictEqual(date);
     });
   });
 
