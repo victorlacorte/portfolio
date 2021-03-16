@@ -53,3 +53,9 @@ export type SpreadsheetFunction = {
   startDate: CalendarDate;
   endDate: CalendarDate;
 } & SpreadsheetTransaction;
+
+export type Logger = {
+  readonly entries: string[];
+  join(separator: string): string;
+  add(entry: string): void;
+};

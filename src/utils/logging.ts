@@ -1,4 +1,6 @@
-export default class Logger {
+import type { Logger as _Logger } from 'src/types';
+
+export default class Logger implements _Logger {
   private _entries: string[] = [];
 
   get entries(): string[] {

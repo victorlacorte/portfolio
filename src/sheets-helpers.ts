@@ -283,3 +283,63 @@ export function snapshot({
     };
   });
 }
+
+type IrpfInput = { year: number } & SpreadsheetTransaction;
+type IrpfOutput = {
+  ticker: string;
+  ownedValuePrevYear: number;
+  ownedValueCurrYear: number;
+  log: string;
+};
+export function irpfHelper({
+  year,
+  ...transactionParams
+}: IrpfInput): IrpfOutput[] {
+  /**
+   * What should be in the returned array?
+   *
+   * ---------------------------------------------------
+   * |Ticker|OwnedValuePrevYear|OwnedValueCurrYear|Log|
+   * ---------------------------------------------------
+   *
+   * Ticker: stock ticker. Could be further utilized to obtain the company's CNPJ and a better asset description*
+   * OwnedValueYearPrior: sold total - purchased total from the year prior to the one provided as argument
+   * OwnedValueCurrYear: sold total - purchased total from `year`
+   * Log: buy and sell transactions need to be discriminated for stocks whose owned value in the current year is zero
+   *
+   * We also need a way to tell "dirty" tickers from "clean" ones: we are interested in the dirty, obviously
+   */
+  const transactions = makeTransactions(transactionParams);
+  const control: { [ticker: string]: Omit<IrpfOutput, 'ticker'> } = {};
+
+  // function handleOperation(transaction: TransactionType): void {
+  //   if (!Object.prototype.hasOwnProperty.call(control, transaction.ticker)) {
+  //     control[transaction.ticker] = new LoggingUtils.Logger();
+  //   }
+
+  //   control[transaction.ticker].add(snapshotLogMsg(transaction));
+  // }
+
+  function handlePurchase(purchase: TransactionType): void {
+    const { ticker, date, quantity, total } = purchase;
+    if (!Object.prototype.hasOwnProperty.call(control, ticker)) {
+      if (date.year <= year) {
+        control[ticker] = {
+          log: new LoggingUtils.Logger(),
+          ownedValuePrevYear: quantity * total,
+          ownedValueCurrYear: 0,
+        };
+      }
+    }
+  }
+
+  function handleSell(sell: TransactionType): void {}
+
+  const stats = statsFrom({
+    startDate: new CalendarDate(1900, 1, 1),
+    endDate: new CalendarDate(year, 12, 31),
+    transactions,
+    onPurchase: handleOperation,
+    onSell: handleOperation,
+  });
+}
