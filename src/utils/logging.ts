@@ -1,4 +1,4 @@
-export class Logger {
+export default class Logger {
   private _entries: string[] = [];
 
   get entries(): string[] {
