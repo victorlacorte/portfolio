@@ -1,38 +1,54 @@
+import { div, mul, sub } from 'src/utils/number';
 import type {
   CalendarDate,
-  Transaction,
   OperationCallback,
   Stats,
+  Transaction,
 } from 'src/types';
 
 import Portfolio from './portfolio';
 
 type StatsFrom = {
-  startDate: CalendarDate;
-  endDate: CalendarDate;
   transactions: Transaction[];
-  onPurchase?: OperationCallback;
+  onBuy?: OperationCallback;
   onSell?: OperationCallback;
 };
 
-export function statsFrom({
-  startDate,
-  endDate,
-  transactions,
-  onPurchase,
-  onSell,
-}: StatsFrom): Stats {
-  const start = startDate.toJSDate();
-  const end = endDate.toJSDate();
-
-  const p = new Portfolio({ onPurchase, onSell });
+export function statsFrom({ transactions, onBuy, onSell }: StatsFrom): Stats {
+  const p = new Portfolio({ onBuy, onSell });
 
   transactions
-    .filter((t) => t.date.toJSDate() >= start && t.date.toJSDate() <= end)
     .sort((t1, t2) => Number(t1.date.toJSDate()) - Number(t2.date.toJSDate()))
     .forEach((t) => {
       p.add(t);
     });
 
   return p.stats;
+}
+
+type FilterTransactions = {
+  transactions: Transaction[];
+  startDate?: CalendarDate;
+  endDate?: CalendarDate;
+};
+
+// Inclusive interval
+export function filterTransactions({
+  transactions,
+  startDate,
+  endDate,
+}: FilterTransactions): Transaction[] {
+  let t = [...transactions];
+
+  if (startDate) {
+    const date = startDate.toJSDate();
+    t = t.filter((x) => x.date.toJSDate() >= date);
+  }
+
+  if (endDate) {
+    const date = endDate.toJSDate();
+    t = t.filter((x) => x.date.toJSDate() <= date);
+  }
+
+  return t;
 }

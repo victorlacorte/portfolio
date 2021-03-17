@@ -1,124 +1,78 @@
 import faker from 'faker';
 
 import { CalendarDate } from 'src/utils/date';
-import type { Operation } from 'src/types';
+import type { Operation, Transaction as _Transaction } from 'src/types';
 
 import Transaction from './transaction';
 import { statsFrom } from './helpers';
 
+const limit = { min: 1, max: 100 };
+
+const date = new CalendarDate(2020, 1, 1);
+const ticker = faker.random.word().toLowerCase();
+const quantity = faker.random.number(limit);
+const averagePrice = faker.random.float(limit);
+const transactionTax = faker.random.float(limit);
+const taxDeduction = faker.random.float(limit);
+
+const makeTransaction = (operation: Operation): _Transaction =>
+  new Transaction({
+    date,
+    ticker,
+    operation,
+    quantity,
+    averagePrice,
+    transactionTax,
+    taxDeduction: operation === 'sell' ? taxDeduction : 0,
+  });
+
+// TODO most of these tests should be rewritten in their respective scopes
 describe('statsFrom', () => {
-  test('Calls onPurchase for each `buy` transaction, and onSell for each `sell` transaction', () => {
-    // Reutilize the same ticker and quantity to be able to sell the purchased amount
-    const quantity = faker.random.number({ min: 1 });
-    const ticker = faker.random.word().toLowerCase();
-
-    // Total is irrelevant; simply needs to be a valid amount
-    const total = faker.random.number({ min: 1 });
-
+  test('Calls onBuy for each `buy` transaction, and onSell for each `sell` transaction', () => {
     const args = {
-      transactions: [
-        new Transaction({
-          date: new CalendarDate(2020, 1, 1),
-          ticker,
-          operation: 'buy' as Operation,
-          quantity,
-          total,
-        }),
-      ],
-      startDate: new CalendarDate(2020, 1, 1),
-      endDate: new CalendarDate(2020, 1, 31),
-      onPurchase: jest.fn(),
+      transactions: [makeTransaction('buy')],
+      onBuy: jest.fn(),
       onSell: jest.fn(),
     };
 
     statsFrom(args);
 
-    expect(args.onPurchase).toHaveBeenCalledTimes(1);
+    expect(args.onBuy).toHaveBeenCalledTimes(1);
     expect(args.onSell).not.toHaveBeenCalled();
 
-    args.onPurchase.mockReset();
+    args.onBuy.mockReset();
     args.onSell.mockReset();
 
     statsFrom({
       ...args,
-      transactions: [
-        new Transaction({
-          date: new CalendarDate(2020, 1, 1),
-          ticker,
-          operation: 'buy' as Operation,
-          quantity,
-          total,
-        }),
-        new Transaction({
-          date: new CalendarDate(2020, 1, 2),
-          ticker,
-          operation: 'buy' as Operation,
-          quantity,
-          total,
-        }),
-      ],
+      transactions: [makeTransaction('buy'), makeTransaction('buy')],
     });
 
-    expect(args.onPurchase).toHaveBeenCalledTimes(2);
+    expect(args.onBuy).toHaveBeenCalledTimes(2);
     expect(args.onSell).not.toHaveBeenCalled();
 
-    args.onPurchase.mockReset();
+    args.onBuy.mockReset();
     args.onSell.mockReset();
 
     statsFrom({
       ...args,
-      transactions: [
-        new Transaction({
-          date: new CalendarDate(2020, 1, 1),
-          ticker,
-          operation: 'buy' as Operation,
-          quantity,
-          total,
-        }),
-        new Transaction({
-          date: new CalendarDate(2020, 1, 2),
-          ticker,
-          operation: 'sell' as Operation,
-          quantity,
-          total,
-        }),
-      ],
+      transactions: [makeTransaction('buy'), makeTransaction('sell')],
     });
 
-    expect(args.onPurchase).toHaveBeenCalledTimes(1);
+    expect(args.onBuy).toHaveBeenCalledTimes(1);
     expect(args.onSell).toHaveBeenCalledTimes(1);
   });
 
   test('Throw an error by attempting to sell before buying', () => {
-    const ticker = faker.random.word().toLowerCase();
-    const quantity = faker.random.number({ min: 1 });
-
     const args = {
-      transactions: [
-        new Transaction({
-          date: new CalendarDate(2020, 1, 1),
-          ticker,
-          operation: 'sell' as Operation,
-          quantity,
-          total: faker.random.number({ min: 1 }),
-        }),
-        new Transaction({
-          date: new CalendarDate(2020, 1, 2),
-          ticker,
-          operation: 'buy' as Operation,
-          quantity,
-          total: faker.random.number({ min: 1 }),
-        }),
-      ],
-      startDate: new CalendarDate(2020, 1, 1),
-      endDate: new CalendarDate(2020, 1, 2),
-      onPurchase: jest.fn(),
+      transactions: [makeTransaction('sell'), makeTransaction('buy')],
+      onBuy: jest.fn(),
       onSell: jest.fn(),
     };
 
     expect(() => statsFrom(args)).toThrow();
 
-    expect(args.onPurchase).not.toHaveBeenCalled();
+    expect(args.onBuy).not.toHaveBeenCalled();
     expect(args.onSell).not.toHaveBeenCalled();
   });
 
@@ -130,27 +84,28 @@ describe('statsFrom', () => {
         new Transaction({
           date: new CalendarDate(2020, 1, 1),
           ticker,
-          operation: 'buy' as Operation,
+          operation: 'buy',
           quantity: 1,
-          total: faker.random.number({ min: 1 }),
+          averagePrice,
+          transactionTax,
         }),
         new Transaction({
           date: new CalendarDate(2020, 1, 2),
           ticker,
-          operation: 'sell' as Operation,
+          operation: 'sell',
           quantity: 2,
-          total: faker.random.number({ min: 1 }),
+          averagePrice: averagePrice + 1,
+          transactionTax,
+          taxDeduction,
         }),
       ],
-      startDate: new CalendarDate(2020, 1, 1),
-      endDate: new CalendarDate(2020, 1, 2),
-      onPurchase: jest.fn(),
+      onBuy: jest.fn(),
       onSell: jest.fn(),
     };
 
     expect(() => statsFrom(args)).toThrow();
 
-    expect(args.onPurchase).toHaveBeenCalledTimes(1);
+    expect(args.onBuy).toHaveBeenCalledTimes(1);
     expect(args.onSell).not.toHaveBeenCalled();
   });
 
@@ -162,93 +117,30 @@ describe('statsFrom', () => {
         new Transaction({
           date: new CalendarDate(2020, 1, 1),
           ticker: 'foo1',
-          operation: 'buy' as Operation,
+          operation: 'buy',
           quantity,
-          total: faker.random.number({ min: 1 }),
+          averagePrice,
+          transactionTax,
         }),
         new Transaction({
           date: new CalendarDate(2020, 1, 2),
           ticker: 'foo2',
-          operation: 'sell' as Operation,
+          operation: 'sell',
           quantity,
-          total: faker.random.number({ min: 1 }),
+          averagePrice,
+          transactionTax,
+          taxDeduction,
         }),
       ],
-      startDate: new CalendarDate(2020, 1, 1),
-      endDate: new CalendarDate(2020, 1, 2),
-      onPurchase: jest.fn(),
+      onBuy: jest.fn(),
       onSell: jest.fn(),
     };
 
     expect(() => statsFrom(args)).toThrow();
 
-    expect(args.onPurchase).toHaveBeenCalledTimes(1);
-    expect(args.onSell).not.toHaveBeenCalled();
-  });
-
-  test('Do not call onSell since the `sell` transaction is outside the date range', () => {
-    const ticker = faker.random.word().toLowerCase();
-    const quantity = faker.random.number({ min: 1 });
-
-    const args = {
-      transactions: [
-        new Transaction({
-          date: new CalendarDate(2020, 1, 1),
-          ticker,
-          operation: 'buy' as Operation,
-          quantity,
-          total: faker.random.number({ min: 1 }),
-        }),
-        new Transaction({
-          date: new CalendarDate(2020, 1, 2),
-          ticker,
-          operation: 'sell' as Operation,
-          quantity,
-          total: faker.random.number({ min: 1 }),
-        }),
-      ],
-      startDate: new CalendarDate(2020, 1, 1),
-      endDate: new CalendarDate(2020, 1, 1),
-      onPurchase: jest.fn(),
-      onSell: jest.fn(),
-    };
-
-    statsFrom(args);
-
-    expect(args.onPurchase).toHaveBeenCalledTimes(1);
-    expect(args.onSell).not.toHaveBeenCalled();
-  });
-
-  test('Do not call onPurchase or onSell since all transaction are outside the date range', () => {
-    const ticker = faker.random.word().toLowerCase();
-    const quantity = faker.random.number({ min: 1 });
-
-    const args = {
-      transactions: [
-        new Transaction({
-          date: new CalendarDate(2020, 1, 1),
-          ticker,
-          operation: 'buy' as Operation,
-          quantity,
-          total: faker.random.number({ min: 1 }),
-        }),
-        new Transaction({
-          date: new CalendarDate(2020, 1, 2),
-          ticker,
-          operation: 'sell' as Operation,
-          quantity,
-          total: faker.random.number({ min: 1 }),
-        }),
-      ],
-      startDate: new CalendarDate(2020, 1, 3),
-      endDate: new CalendarDate(2020, 1, 3),
-      onPurchase: jest.fn(),
-      onSell: jest.fn(),
-    };
-
-    statsFrom(args);
-
-    expect(args.onPurchase).not.toHaveBeenCalled();
+    expect(args.onBuy).toHaveBeenCalledTimes(1);
     expect(args.onSell).not.toHaveBeenCalled();
   });
 });
+
+// TODO describe filterTransactions

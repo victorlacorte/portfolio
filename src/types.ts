@@ -13,17 +13,17 @@ export type CalendarDate = {
   valid(): boolean;
 } & BasicDate;
 
+export type Stats = {
+  [ticker: string]: {
+    averagePrice: number;
+    purchased: StatsControl;
+    sold: StatsControl;
+  };
+};
+
 type StatsControl = {
   qty: number;
   total: number;
-};
-
-export type Stats = {
-  [ticker: string]: {
-    purchased: StatsControl;
-    sold: StatsControl;
-    averagePrice: number;
-  };
 };
 
 export type OperationCallback = (
@@ -36,7 +36,9 @@ export type Transaction = {
   ticker: string;
   operation: Operation;
   quantity: number;
-  total: number;
+  averagePrice: number;
+  transactionTax: number;
+  // Present in sell transactions
   taxDeduction?: number;
 };
 

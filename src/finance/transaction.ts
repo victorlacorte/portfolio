@@ -6,35 +6,41 @@ import type {
 } from 'src/types';
 
 /**
- * `Total` might be zero as a side effect to include `buy` operations that
- * represent stock dividends (i.e. an increase in the position for no cost),
- * but `quantity` is probably strictly positive.
+ * `averagePrice` might be zero as a side effect to include `buy` operations
+ * that represent stock dividends (i.e. an increase in the position for no
+ * cost), but `quantity` is probably strictly positive.
  */
 export default class Transaction implements _Transaction {
   private readonly _date: CalendarDate;
   private readonly _ticker: string;
   private readonly _operation: Operation;
   private readonly _quantity: number;
-  private readonly _total: number;
-  private readonly _taxDeduction: number;
+  private readonly _averagePrice: number;
+  private readonly _transactionTax: number;
+  private readonly _taxDeduction?: number;
 
   constructor({
     date,
     ticker,
     operation,
     quantity,
-    total,
-    taxDeduction,
+    averagePrice,
+    transactionTax,
+    taxDeduction = 0,
   }: _Transaction) {
     if (!Number.isInteger(quantity) || quantity <= 0) {
       throw new Error(expectedPositive(quantity));
     }
 
-    if (total < 0) {
-      throw new Error(expectedPositiveOrZero(total));
+    if (averagePrice < 0) {
+      throw new Error(expectedPositiveOrZero(averagePrice));
     }
 
-    if (isFinite(taxDeduction) && taxDeduction < 0) {
+    if (transactionTax <= 0) {
+      throw new Error(expectedPositive(transactionTax));
+    }
+
+    if (taxDeduction < 0) {
       throw new Error(expectedPositiveOrZero(taxDeduction));
     }
 
@@ -42,8 +48,9 @@ export default class Transaction implements _Transaction {
     this._ticker = ticker.toLowerCase();
     this._operation = operation.toLowerCase() as Operation;
     this._quantity = quantity;
-    this._total = total;
-    this._taxDeduction = taxDeduction || 0;
+    this._averagePrice = averagePrice;
+    this._transactionTax = transactionTax;
+    this._taxDeduction = taxDeduction;
   }
 
   get date(): CalendarDate {
@@ -62,8 +69,12 @@ export default class Transaction implements _Transaction {
     return this._quantity;
   }
 
-  get total(): number {
-    return this._total;
+  get averagePrice(): number {
+    return this._averagePrice;
+  }
+
+  get transactionTax(): number {
+    return this._transactionTax;
   }
 
   get taxDeduction(): number {
@@ -76,7 +87,8 @@ export default class Transaction implements _Transaction {
       ticker: this.ticker,
       operation: this.operation,
       quantity: this.quantity,
-      total: this.total,
+      averagePrice: this.averagePrice,
+      transactionTax: this.transactionTax,
       taxDeduction: this.taxDeduction,
     };
   }

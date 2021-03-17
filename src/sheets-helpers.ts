@@ -256,7 +256,7 @@ export function snapshot({
     startDate,
     endDate,
     transactions,
-    onPurchase: handleOperation,
+    onBuy: handleOperation,
     onSell: handleOperation,
   });
 
@@ -349,7 +349,7 @@ export function irpfHelper({ baseYear, ...transactionParams }: IrpfInput) {
     startDate: new CalendarDate(1900, 1, 1),
     endDate: new CalendarDate(baseYear, 12, 31),
     transactions,
-    onPurchase: handleOperation,
+    onBuy: handleOperation,
     onSell: handleOperation,
   });
 

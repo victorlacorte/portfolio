@@ -1,95 +1,122 @@
 import faker from 'faker';
 
 import { CalendarDate } from 'src/utils/date';
-import type { Operation } from 'src/types';
+import type { Operation, Transaction as _Transaction } from 'src/types';
 
 import Transaction from './transaction';
 
+const date = new CalendarDate(2020, 1, 1);
+const ticker = faker.random.word().toLowerCase();
+
+const limit = { min: 1, max: 100 };
+
+const quantity = {
+  valid: faker.random.number(limit),
+  invalid: faker.random.number({ min: -100, max: 0 }),
+};
+
+const averagePrice = {
+  valid: faker.random.float(limit),
+  invalid: faker.random.float({ min: -100, max: 0 }),
+};
+
+const transactionTax = faker.random.float(limit);
+const taxDeduction = faker.random.float(limit);
+
+type MakeTransaction = {
+  operation: Operation;
+  quantity: number;
+  averagePrice: number;
+};
+
+const makeTransaction = ({
+  operation,
+  quantity,
+  averagePrice,
+}: MakeTransaction) => (): _Transaction =>
+  new Transaction({
+    date,
+    ticker,
+    operation,
+    quantity,
+    averagePrice,
+    transactionTax,
+    taxDeduction: operation === 'sell' ? taxDeduction : 0,
+  });
+
 describe('Transaction', () => {
   test('Throws when expected', () => {
-    // Both ticker and date are not relevant for the tests
-    const ticker = faker.random.word().toLowerCase();
-    const date = new CalendarDate(2020, 1, 1);
-
-    const validQuantity = faker.random.number({ min: 1 });
-    const validTotal = faker.random.number({ min: 1 });
-
-    const invalidQuantity = 0; // any non-positive integer
-    const invalidTotal = -1; // any number less than zero
-
     const testCases = [
       {
-        date,
-        ticker,
-        operation: 'buy' as Operation,
-        quantity: validQuantity,
-        total: validTotal,
+        transaction: makeTransaction({
+          operation: 'buy',
+          quantity: quantity.valid,
+          averagePrice: averagePrice.valid,
+        }),
         shouldThrow: false,
       },
       {
-        date,
-        ticker,
-        operation: 'sell' as Operation,
-        quantity: validQuantity,
-        total: validTotal,
+        transaction: makeTransaction({
+          operation: 'sell',
+          quantity: quantity.valid,
+          averagePrice: averagePrice.valid,
+        }),
         shouldThrow: false,
       },
       {
-        date,
-        ticker,
-        operation: 'buy' as Operation,
-        quantity: invalidQuantity,
-        total: validTotal,
+        transaction: makeTransaction({
+          operation: 'buy',
+          quantity: quantity.invalid,
+          averagePrice: averagePrice.valid,
+        }),
         shouldThrow: true,
       },
       {
-        date,
-        ticker,
-        operation: 'sell' as Operation,
-        quantity: invalidQuantity,
-        total: validTotal,
+        transaction: makeTransaction({
+          operation: 'sell',
+          quantity: quantity.invalid,
+          averagePrice: averagePrice.valid,
+        }),
         shouldThrow: true,
       },
       {
-        date,
-        ticker,
-        operation: 'buy' as Operation,
-        quantity: validQuantity,
-        total: invalidTotal,
+        transaction: makeTransaction({
+          operation: 'buy',
+          quantity: quantity.valid,
+          averagePrice: averagePrice.invalid,
+        }),
         shouldThrow: true,
       },
       {
-        date,
-        ticker,
-        operation: 'sell' as Operation,
-        quantity: validQuantity,
-        total: invalidTotal,
+        transaction: makeTransaction({
+          operation: 'sell',
+          quantity: quantity.valid,
+          averagePrice: averagePrice.invalid,
+        }),
         shouldThrow: true,
       },
       {
-        date,
-        ticker,
-        operation: 'buy' as Operation,
-        quantity: invalidQuantity,
-        total: invalidTotal,
+        transaction: makeTransaction({
+          operation: 'buy',
+          quantity: quantity.invalid,
+          averagePrice: averagePrice.invalid,
+        }),
         shouldThrow: true,
       },
       {
-        date,
-        ticker,
-        operation: 'sell' as Operation,
-        quantity: invalidQuantity,
-        total: invalidTotal,
+        transaction: makeTransaction({
+          operation: 'sell',
+          quantity: quantity.invalid,
+          averagePrice: averagePrice.invalid,
+        }),
         shouldThrow: true,
       },
     ];
 
-    testCases.forEach(({ shouldThrow, ...t }) => {
-      if (shouldThrow) {
-        expect(() => new Transaction(t)).toThrow();
-      } else {
-        expect(() => new Transaction(t)).not.toThrow();
-      }
+    testCases.forEach(({ transaction, shouldThrow }) => {
+      shouldThrow
+        ? expect(() => transaction()).toThrow()
+        : expect(() => transaction()).not.toThrow();
     });
   });
 });
