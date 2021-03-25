@@ -1,12 +1,12 @@
 import faker from 'faker';
 
-import { CalendarDate } from './utils/date';
+import { statsFrom } from 'src/finance';
 
+import { CalendarDate } from '../utils/date';
 import {
   irpfHelper,
   makeTransactions,
   profit,
-  profitLogMsg,
   sameLength,
   sanitizeDates,
   sanitizeNumbers,
@@ -14,8 +14,7 @@ import {
   sanitizeSparseMatrix,
   sanitizeTickers,
   snapshot,
-} from './sheets-helpers';
-import { statsFrom } from './finance';
+} from './helpers';
 
 describe('Sheets helpers', () => {
   test('sanitizeSparseMatrix', () => {
@@ -158,21 +157,6 @@ describe('Sheets helpers', () => {
     expect(sanitizeNumbers([[100.0], [1000.23], ,])).toEqual([100, 1000.23]);
     // We need to "trick" the number conversion otherwise we get type checked and our test won't throw
     expect(() => sanitizeNumbers([[1], [Number('foo')], ,])).toThrow();
-  });
-
-  test('profitLogMsg', () => {
-    const stats = {
-      date: new CalendarDate(2020, 1, 1),
-      ticker: 'foo1',
-      quantity: 100,
-      total: 1000,
-      purchasedValue: 900,
-      profit: 10,
-      taxDeduction: 1,
-    };
-    expect(profitLogMsg(stats)).toMatchInlineSnapshot(
-      `"2020/01/01: [FOO1] quantity=100, total=1,000.00, profit=10.00 (1.11%), tax=1.00"`,
-    );
   });
 
   describe('profit', () => {

@@ -1,28 +1,29 @@
 import { add, div, mul, sub } from 'src/utils/number';
 import { invalidSellQty } from 'src/utils/messages';
-import type { OperationCallback, Stats, Transaction } from 'src/types';
+import type { BuySellEvent, Stats, Transaction } from 'src/types';
 
 const makeDefaultStats = (): Stats[keyof Stats] => ({
   averagePrice: 0,
   purchased: {
-    qty: 0,
+    quantity: 0,
     total: 0,
   },
   sold: {
-    qty: 0,
+    quantity: 0,
     total: 0,
   },
 });
 
+// TODO onBuy and onSell should have different parameters. Need to inspect usage to better understand it
 export default class Portfolio {
   private readonly _stats: Stats = {};
-  private readonly _onBuy?: OperationCallback;
-  private readonly _onSell?: OperationCallback;
+  private readonly _onBuy?: BuySellEvent;
+  private readonly _onSell?: BuySellEvent;
 
   constructor(
     params: {
-      onBuy?: OperationCallback;
-      onSell?: OperationCallback;
+      onBuy?: BuySellEvent;
+      onSell?: BuySellEvent;
     } = {},
   ) {
     const { onBuy = null, onSell = null } = params;
@@ -54,14 +55,15 @@ export default class Portfolio {
     if (!Object.prototype.hasOwnProperty.call(this._stats, ticker)) {
       this._stats[ticker] = makeDefaultStats();
     }
+
     const transactionTotal = add(mul(averagePrice, quantity), transactionTax);
 
     if (!this._stats[ticker].averagePrice) {
       this._stats[ticker].averagePrice = div(transactionTotal, quantity);
     } else {
       const currentQty = sub(
-        this._stats[ticker].purchased.qty,
-        this._stats[ticker].sold.qty,
+        this._stats[ticker].purchased.quantity,
+        this._stats[ticker].sold.quantity,
       );
 
       const currentValue = mul(this._stats[ticker].averagePrice, currentQty);
@@ -72,8 +74,8 @@ export default class Portfolio {
       );
     }
 
-    this._stats[ticker].purchased.qty = add(
-      this._stats[ticker].purchased.qty,
+    this._stats[ticker].purchased.quantity = add(
+      this._stats[ticker].purchased.quantity,
       quantity,
     );
 
@@ -82,7 +84,8 @@ export default class Portfolio {
       transactionTotal,
     );
 
-    this._onBuy && this._onBuy(t, this.stats);
+    this._onBuy &&
+      this._onBuy({ ...t, total: transactionTotal }, this.stats[ticker]);
   }
 
   // TODO document we call the `onSell` callback before deleting `ticker` from `stats`
@@ -91,22 +94,31 @@ export default class Portfolio {
 
     if (
       !Object.prototype.hasOwnProperty.call(this._stats, ticker) ||
-      quantity > this._stats[ticker].purchased.qty ||
-      taxDeduction == 0
+      quantity > this._stats[ticker].purchased.quantity ||
+      !taxDeduction
     ) {
       throw new Error(`Invalid sell transaction: ${JSON.stringify(t)}`);
     }
 
-    this._stats[ticker].sold.qty = add(this._stats[ticker].sold.qty, quantity);
-
-    this._stats[ticker].sold.total = sub(
-      add(this._stats[ticker].sold.total, mul(averagePrice, quantity)),
-      transactionTax,
+    this._stats[ticker].sold.quantity = add(
+      this._stats[ticker].sold.quantity,
+      quantity,
     );
 
-    this._onSell && this._onSell(t, this.stats);
+    const transactionTotal = sub(mul(averagePrice, quantity), transactionTax);
 
-    if (this._stats[ticker].purchased.qty == this._stats[ticker].sold.qty) {
+    this._stats[ticker].sold.total = add(
+      this._stats[ticker].sold.total,
+      transactionTotal,
+    );
+
+    this._onSell &&
+      this._onSell({ ...t, total: transactionTotal }, this.stats[ticker]);
+
+    if (
+      this._stats[ticker].purchased.quantity ==
+      this._stats[ticker].sold.quantity
+    ) {
       this._stats[ticker] = makeDefaultStats();
     }
   }

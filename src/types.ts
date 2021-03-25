@@ -2,6 +2,22 @@ import { operations } from './constants';
 
 export type Operation = typeof operations[number];
 
+export type NamedRange<T> = T[][];
+
+type SpreadsheetColumn =
+  | 'date'
+  | 'ticker'
+  | 'operation'
+  | 'quantity'
+  | 'averagePrice'
+  | 'transactionTax'
+  | 'taxDeduction';
+
+export type SpreadsheetTransaction = Record<
+  SpreadsheetColumn,
+  NamedRange<string>
+>;
+
 type BasicDate = {
   year: number;
   month: number;
@@ -22,13 +38,14 @@ export type Stats = {
 };
 
 type StatsControl = {
-  qty: number;
+  quantity: number;
   total: number;
 };
 
-export type OperationCallback = (
-  transaction: Transaction,
-  stats: Stats,
+// onTransaction: the parameters should be changed, though
+export type BuySellEvent = (
+  t: Transaction & { total: number },
+  s: Stats[keyof Stats],
 ) => void;
 
 export type Transaction = {
@@ -42,19 +59,10 @@ export type Transaction = {
   taxDeduction?: number;
 };
 
-export type SpreadsheetTransaction = {
-  dates: Date[][];
-  tickers: string[][];
-  operations: string[][];
-  quantities: number[][];
-  totals: number[][];
-  taxDeductions?: number[][];
-};
-
-export type SpreadsheetFunction = {
-  startDate: CalendarDate;
-  endDate: CalendarDate;
-} & SpreadsheetTransaction;
+// export type SpreadsheetFunction = {
+//   startDate?: CalendarDate;
+//   endDate?: CalendarDate;
+// } & SpreadsheetTransaction;
 
 export type Logger = {
   readonly entries: string[];

@@ -1,5 +1,7 @@
+// TODO candidate for deprecation
 export const invalidSellQty =
   'Invalid sell quantity: available total is less than the purchased one';
+
 export const diffLengthNR = 'Named ranges contain different non-empty cells';
 
 export const expectedReceived = (

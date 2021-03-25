@@ -1,17 +1,12 @@
 import { div, mul, sub } from 'src/utils/number';
-import type {
-  CalendarDate,
-  OperationCallback,
-  Stats,
-  Transaction,
-} from 'src/types';
+import type { CalendarDate, BuySellEvent, Stats, Transaction } from 'src/types';
 
 import Portfolio from './portfolio';
 
 type StatsFrom = {
   transactions: Transaction[];
-  onBuy?: OperationCallback;
-  onSell?: OperationCallback;
+  onBuy?: BuySellEvent;
+  onSell?: BuySellEvent;
 };
 
 export function statsFrom({ transactions, onBuy, onSell }: StatsFrom): Stats {

@@ -162,6 +162,7 @@ type ProfitReturn = {
   log: string;
 };
 
+// we need to provide only the month and year
 export function profit({
   startDate,
   endDate,
@@ -232,7 +233,7 @@ type SnapshotReturn = {
  * TODO we could list the actual values rather than return "NA" but it would modify
  * the Finance.statsFrom function i.e. we need to delete closed position
  * tickers but they still need to be logged for improved visibility. As of now,
- * we simply delete them, and utilize the OperationCallbacks to record
+ * we simply delete them, and utilize the BuySellEvents to record
  * transaction information
  */
 export function snapshot({
