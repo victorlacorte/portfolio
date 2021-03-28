@@ -1,6 +1,7 @@
 import faker from 'faker';
 
 import { CalendarDate } from 'src/utils/date';
+import { operations } from 'src/constants';
 import type { Operation, Transaction as _Transaction } from 'src/types';
 
 import Transaction from './transaction';
@@ -50,7 +51,7 @@ const makeTransaction = ({
     quantity,
     averagePrice,
     transactionTax,
-    taxDeduction: operation === 'sell' ? taxDeduction : 0,
+    taxDeduction: operation === 'sell' ? taxDeduction : null,
   });
 
 describe('finance/transaction/validation', () => {
@@ -79,15 +80,17 @@ describe('finance/transaction/validation', () => {
     ];
 
     testCases.forEach(({ shouldThrow, ...t }) => {
-      ['buy', 'sell'].forEach((op) => {
-        const transaction = makeTransaction({
-          ...t,
-          operation: op as Operation,
-        });
+      // The outcome is independent of the operation
+      operations.forEach((op) => {
+        const make = () =>
+          makeTransaction({
+            ...t,
+            operation: op,
+          });
 
         shouldThrow
-          ? expect(() => transaction.validate()).toThrow()
-          : expect(() => transaction.validate()).not.toThrow();
+          ? expect(() => make()).toThrow()
+          : expect(() => make()).not.toThrow();
       });
     });
   });

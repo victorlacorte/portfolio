@@ -20,20 +20,18 @@ export default class Transaction implements _Transaction {
       taxDeduction,
     } = params;
 
-    return new this(
-      date,
-      ticker,
-      operation,
-      quantity,
-      averagePrice,
-      transactionTax,
-      total,
-      taxDeduction,
+    return validateTransaction(
+      new this(
+        date,
+        ticker,
+        operation,
+        quantity,
+        averagePrice,
+        transactionTax,
+        total,
+        taxDeduction,
+      ),
     );
-  }
-
-  validate(): void {
-    validateTransaction(this);
   }
 
   private constructor(
