@@ -18,16 +18,17 @@ export type SpreadsheetTransaction = Record<
   NamedRange<string>
 >;
 
-type BasicDate = {
+export type DateBase = {
   year: number;
   month: number;
   day: number;
 };
 
-export type CalendarDate = {
+export type SimpleDate = {
   toJSDate(): Date;
-  valid(): boolean;
-} & BasicDate;
+  toString(): string;
+  toJSON(): DateBase;
+} & DateBase;
 
 export type Stats = {
   [ticker: string]: {
@@ -42,26 +43,29 @@ type StatsControl = {
   total: number;
 };
 
-// onTransaction: the parameters should be changed, though
-export type BuySellEvent = (
-  t: Transaction & { total: number },
-  s: Stats[keyof Stats],
-) => void;
+export type BuySellEvent = (t: Transaction, s: Stats[keyof Stats]) => void;
 
-export type Transaction = {
-  date: CalendarDate;
+export type TransactionBase = {
+  date: SimpleDate;
   ticker: string;
   operation: Operation;
   quantity: number;
   averagePrice: number;
   transactionTax: number;
+  // Might still be undefined
+  total?: number;
   // Present in sell transactions
   taxDeduction?: number;
 };
 
+export type Transaction = {
+  toString(): string;
+  toJSON(): TransactionBase;
+} & TransactionBase;
+
 // export type SpreadsheetFunction = {
-//   startDate?: CalendarDate;
-//   endDate?: CalendarDate;
+//   startDate?: SimpleDate;
+//   endDate?: SimpleDate;
 // } & SpreadsheetTransaction;
 
 export type Logger = {

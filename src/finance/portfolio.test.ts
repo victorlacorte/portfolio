@@ -1,6 +1,6 @@
 import faker from 'faker';
 
-import { CalendarDate } from 'src/utils/date';
+import { SimpleDate } from 'src/utils/date';
 import { toFixed } from 'src/utils/number';
 import type { Operation } from 'src/types';
 
@@ -9,6 +9,7 @@ import Transaction from './transaction';
 
 const ticker = faker.random.word().toLowerCase();
 
+// TODO the Portfolio should guarantee onBuy/onSell callbacks are called when expected
 describe('Portfolio', () => {
   test('The averagePrice behaves as expected after successive buy operations', () => {
     // reproducing the example in https://www.bussoladoinvestidor.com.br/calculo-do-preco-medio-de-acoes/
@@ -16,11 +17,11 @@ describe('Portfolio', () => {
     // 2. 01/02: buy 100 stocks, average buy price = 12.217: average price = (9.22*100 + 12.217*100) / 200 = 10.72
     // 3. 01/03: buy 200 stocks, average buy price = 15.118: average price = (10.72*200 + 15.118 * 200) / 400 = 12.92
 
-    const portfolio = new Portfolio();
+    const portfolio = Portfolio.make();
 
     portfolio.add(
-      new Transaction({
-        date: new CalendarDate(2020, 1, 1),
+      Transaction.make({
+        date: SimpleDate.make({ year: 2020, month: 1, day: 1 }),
         ticker,
         operation: 'buy',
         quantity: 100,
@@ -32,8 +33,8 @@ describe('Portfolio', () => {
     expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(9.22);
 
     portfolio.add(
-      new Transaction({
-        date: new CalendarDate(2020, 1, 2),
+      Transaction.make({
+        date: SimpleDate.make({ year: 2020, month: 1, day: 2 }),
         ticker,
         operation: 'buy',
         quantity: 100,
@@ -45,8 +46,8 @@ describe('Portfolio', () => {
     expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(10.72);
 
     portfolio.add(
-      new Transaction({
-        date: new CalendarDate(2020, 1, 3),
+      Transaction.make({
+        date: SimpleDate.make({ year: 2020, month: 1, day: 3 }),
         ticker,
         operation: 'buy',
         quantity: 200,
@@ -65,11 +66,11 @@ describe('Portfolio', () => {
     // 3. 01/03: sell 50 stocks, the price does not matter: average price = 10.72 (previous one)
     // 3. 01/04: buy 200 stocks, average buy price = 15.118: average price = (10.72*150 + 15.118*200) / 350 = 13.23
 
-    const portfolio = new Portfolio();
+    const portfolio = Portfolio.make();
 
     portfolio.add(
-      new Transaction({
-        date: new CalendarDate(2020, 1, 1),
+      Transaction.make({
+        date: SimpleDate.make({ year: 2020, month: 1, day: 1 }),
         ticker,
         operation: 'buy',
         quantity: 100,
@@ -81,8 +82,8 @@ describe('Portfolio', () => {
     expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(9.22);
 
     portfolio.add(
-      new Transaction({
-        date: new CalendarDate(2020, 1, 2),
+      Transaction.make({
+        date: SimpleDate.make({ year: 2020, month: 1, day: 2 }),
         ticker,
         operation: 'buy',
         quantity: 100,
@@ -94,8 +95,8 @@ describe('Portfolio', () => {
     expect(toFixed(portfolio.stats[ticker].averagePrice, 2)).toBe(10.72);
 
     portfolio.add(
-      new Transaction({
-        date: new CalendarDate(2020, 1, 3),
+      Transaction.make({
+        date: SimpleDate.make({ year: 2020, month: 1, day: 3 }),
         ticker,
         operation: 'sell',
         quantity: 50,
@@ -106,8 +107,8 @@ describe('Portfolio', () => {
     );
 
     portfolio.add(
-      new Transaction({
-        date: new CalendarDate(2020, 1, 4),
+      Transaction.make({
+        date: SimpleDate.make({ year: 2020, month: 1, day: 4 }),
         ticker,
         operation: 'buy',
         quantity: 200,

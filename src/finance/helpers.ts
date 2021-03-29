@@ -1,5 +1,5 @@
 import { div, mul, sub } from 'src/utils/number';
-import type { CalendarDate, BuySellEvent, Stats, Transaction } from 'src/types';
+import type { SimpleDate, BuySellEvent, Stats, Transaction } from 'src/types';
 
 import Portfolio from './portfolio';
 
@@ -10,7 +10,7 @@ type StatsFrom = {
 };
 
 export function statsFrom({ transactions, onBuy, onSell }: StatsFrom): Stats {
-  const p = new Portfolio({ onBuy, onSell });
+  const p = Portfolio.make({ onBuy, onSell });
 
   transactions
     .sort((t1, t2) => Number(t1.date.toJSDate()) - Number(t2.date.toJSDate()))
@@ -23,8 +23,8 @@ export function statsFrom({ transactions, onBuy, onSell }: StatsFrom): Stats {
 
 type FilterTransactions = {
   transactions: Transaction[];
-  startDate?: CalendarDate;
-  endDate?: CalendarDate;
+  startDate?: SimpleDate;
+  endDate?: SimpleDate;
 };
 
 // Inclusive interval

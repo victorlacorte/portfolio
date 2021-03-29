@@ -1,5 +1,5 @@
 import { Transaction } from '../finance';
-import { CalendarDate } from '../utils/date';
+import { SimpleDate } from '../utils/date';
 import { operations } from '../constants';
 import {
   diffLengthNR,
@@ -7,7 +7,7 @@ import {
   expectedReceived,
 } from '../utils/messages';
 import type {
-  CalendarDate as _CalendarDate,
+  SimpleDate as _SimpleDate,
   NamedRange,
   Operation,
   SpreadsheetTransaction,
@@ -30,9 +30,9 @@ export function sanitizeNamedRange(range: NamedRange<unknown>): string[] {
 
 /**
  * @param x date strings in the format yyyy/mm/dd
- * @returns CalendarDates
+ * @returns SimpleDates
  */
-export function sanitizeDates(x: string[]): _CalendarDate[] {
+export function sanitizeDates(x: string[]): _SimpleDate[] {
   return x.map((d, idx) => {
     const sanitized = d.replace(/\W/g, '');
 
@@ -40,11 +40,11 @@ export function sanitizeDates(x: string[]): _CalendarDate[] {
       throw new Error(expectedReceived('a yyyy/mm/dd date', d, idx + 1));
     }
 
-    const year = sanitized.slice(0, 4);
-    const month = sanitized.slice(4, 6);
-    const day = sanitized.slice(6, 8);
+    const year = Number(sanitized.slice(0, 4));
+    const month = Number(sanitized.slice(4, 6));
+    const day = Number(sanitized.slice(6, 8));
 
-    return new CalendarDate(Number(year), Number(month), Number(day));
+    return SimpleDate.make({ year, month, day });
   });
 }
 

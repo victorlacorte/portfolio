@@ -1,96 +1,92 @@
 import faker from 'faker';
 
-import { CalendarDate } from 'src/utils/date';
+import { SimpleDate } from 'src/utils/date';
 import { operations } from 'src/constants';
-import type { Operation, Transaction as _Transaction } from 'src/types';
+import type { Transaction as _Transaction, TransactionBase } from 'src/types';
 
 import Transaction from './transaction';
 
-const date = new CalendarDate(2020, 1, 1);
+const date = SimpleDate.make({ year: 2020, month: 1, day: 1 });
 const ticker = faker.random.word().toLowerCase();
 
-const validNumberlimit = { min: 1, max: 100 };
-const invalidNumberLimit = { min: -100, max: 0 };
+// max is arbitrary: valid numbers are >= 1
+const validNumberlimit = { min: 1, max: 2 };
 
-const transactionTax = faker.random.float(validNumberlimit);
-const taxDeduction = faker.random.float(validNumberlimit);
+// min is arbitrary: invalid numbers are < 0
+const invalidNumberLimit = { min: -2, max: -1 };
 
-const quantity = {
-  valid() {
-    return faker.random.number(validNumberlimit);
-  },
-  invalid() {
-    return faker.random.number(invalidNumberLimit);
-  },
-};
+// TODO this test is not perfect since we should not rely on random values
+// Also, averagePrice might be zero and is not covered
+function makeNumber(isInt: boolean, isValid: boolean): number {
+  const fn = isInt ? faker.random.number : faker.random.float;
 
-const averagePrice = {
-  valid() {
-    return faker.random.float(validNumberlimit);
-  },
-  invalid() {
-    return faker.random.float(invalidNumberLimit);
-  },
-};
-
-type MakeTransaction = {
-  operation: Operation;
-  quantity: number;
-  averagePrice: number;
-};
+  return fn(isValid ? validNumberlimit : invalidNumberLimit);
+}
 
 const makeTransaction = ({
   averagePrice,
   operation,
   quantity,
-}: MakeTransaction): _Transaction =>
+  transactionTax,
+  taxDeduction,
+  total,
+}: Omit<TransactionBase, 'date' | 'ticker'>): _Transaction =>
   Transaction.make({
+    // Date and ticker are irrelevant
     date,
     ticker,
     operation,
     quantity,
     averagePrice,
     transactionTax,
-    taxDeduction: operation === 'sell' ? taxDeduction : null,
+    taxDeduction,
+    total,
   });
 
 describe('finance/transaction/validation', () => {
   test('Throws when expected', () => {
-    const testCases = [
-      {
-        shouldThrow: false,
-        quantity: quantity.valid(),
-        averagePrice: averagePrice.valid(),
-      },
-      {
-        shouldThrow: true,
-        quantity: quantity.invalid(),
-        averagePrice: averagePrice.valid(),
-      },
-      {
-        shouldThrow: true,
-        quantity: quantity.valid(),
-        averagePrice: averagePrice.invalid(),
-      },
-      {
-        shouldThrow: true,
-        quantity: quantity.invalid(),
-        averagePrice: averagePrice.invalid(),
-      },
-    ];
+    [true, false].forEach((isValidAveragePrice) => {
+      [true, false].forEach((isValidQuantity) => {
+        [true, false].forEach((isValidTransactionTax) => {
+          [true, false].forEach((isValidTotal) => {
+            [true, false].forEach((isValidTaxDeduction) => {
+              // The outcome is independent of the operation
+              operations.forEach((op) => {
+                const make = () =>
+                  makeTransaction({
+                    averagePrice: isValidAveragePrice
+                      ? makeNumber(false, true)
+                      : makeNumber(false, false),
+                    quantity: isValidQuantity
+                      ? makeNumber(true, true)
+                      : makeNumber(true, false),
+                    transactionTax: isValidTransactionTax
+                      ? makeNumber(false, true)
+                      : makeNumber(false, false),
+                    total: isValidTotal
+                      ? makeNumber(false, true)
+                      : makeNumber(false, false),
+                    taxDeduction: isValidTaxDeduction
+                      ? makeNumber(false, true)
+                      : makeNumber(false, false),
+                    operation: op,
+                  });
 
-    testCases.forEach(({ shouldThrow, ...t }) => {
-      // The outcome is independent of the operation
-      operations.forEach((op) => {
-        const make = () =>
-          makeTransaction({
-            ...t,
-            operation: op,
+                if (
+                  isValidAveragePrice &&
+                  isValidQuantity &&
+                  isValidTransactionTax &&
+                  isValidTotal &&
+                  isValidTaxDeduction
+                ) {
+                  expect(() => make()).not.toThrow();
+                } else {
+                  expect(() => make()).toThrow();
+                }
+              });
+            });
           });
-
-        shouldThrow
-          ? expect(() => make()).toThrow()
-          : expect(() => make()).not.toThrow();
+        });
       });
     });
   });

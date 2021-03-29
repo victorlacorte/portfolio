@@ -1,4 +1,4 @@
-import type { CalendarDate, Transaction } from 'src/types';
+import type { Transaction } from 'src/types';
 
 import { div, format, toCurrency, toFixed } from '../utils/number';
 

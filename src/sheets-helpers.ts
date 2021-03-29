@@ -1,4 +1,4 @@
-import { CalendarDate } from './utils/date';
+import { SimpleDate } from './utils/date';
 import Logger from './utils/logging';
 import {
   expectedFinite,
@@ -10,7 +10,7 @@ import { div, format, mul, sub, toCurrency, toFixed } from './utils/number';
 import { operations } from './constants';
 import { statsFrom, Transaction as FinanceTransaction } from './finance';
 import type {
-  CalendarDate as CalendarDateType,
+  SimpleDate as SimpleDateType,
   Logger as _Logger,
   Operation,
   Transaction as TransactionType,
@@ -29,8 +29,8 @@ export function sameLength(...arrays: any[]): boolean {
   return arrays.every((arr) => arr.length === length);
 }
 
-export function sanitizeDates(dates: Date[][]): CalendarDateType[] {
-  return sanitizeSparseMatrix(dates).map((d) => CalendarDate.fromJSDate(d));
+export function sanitizeDates(dates: Date[][]): SimpleDateType[] {
+  return sanitizeSparseMatrix(dates).map((d) => SimpleDate.fromJSDate(d));
 }
 
 export function sanitizeTickers(tickers: string[][]): string[] {
@@ -54,6 +54,7 @@ export function sanitizeOperations(x: string[][]): Operation[] {
   });
 }
 
+// TODO Number.isFinite rather than isFinite
 export function sanitizeNumbers(numbers: number[][]): number[] {
   return sanitizeSparseMatrix(numbers).map((n, idx) => {
     if (!isFinite(n)) {
@@ -166,9 +167,9 @@ type ProfitReturn = {
 export function profit({
   startDate,
   endDate,
-  ...transactionParams
+  ...TransactionBase
 }: SpreadsheetFunction): ProfitReturn {
-  const transactions = makeTransactions(transactionParams);
+  const transactions = makeTransactions(TransactionBase);
 
   let total = 0;
   let profit = 0;
@@ -239,9 +240,9 @@ type SnapshotReturn = {
 export function snapshot({
   startDate,
   endDate,
-  ...transactionParams
+  ...TransactionBase
 }: SpreadsheetFunction): SnapshotReturn[] {
-  const transactions = makeTransactions(transactionParams);
+  const transactions = makeTransactions(TransactionBase);
 
   const control: { [ticker: string]: Logger } = {};
 
@@ -293,7 +294,7 @@ type IrpfOutput = {
   ownedValueCurrYear: number;
   log: _Logger;
 };
-export function irpfHelper({ baseYear, ...transactionParams }: IrpfInput) {
+export function irpfHelper({ baseYear, ...TransactionBase }: IrpfInput) {
   /**
    * What should be in the returned array?
    *
@@ -308,7 +309,7 @@ export function irpfHelper({ baseYear, ...transactionParams }: IrpfInput) {
    *
    * We also need a way to tell "dirty" tickers from "clean" ones: we are interested in the dirty, obviously
    */
-  const transactions = makeTransactions(transactionParams);
+  const transactions = makeTransactions(TransactionBase);
   const control: { [ticker: string]: Omit<IrpfOutput, 'ticker'> } = {};
 
   // function handleOperation(transaction: TransactionType): void {
@@ -347,8 +348,8 @@ export function irpfHelper({ baseYear, ...transactionParams }: IrpfInput) {
   }
 
   statsFrom({
-    startDate: new CalendarDate(1900, 1, 1),
-    endDate: new CalendarDate(baseYear, 12, 31),
+    startDate: new SimpleDate(1900, 1, 1),
+    endDate: new SimpleDate(baseYear, 12, 31),
     transactions,
     onBuy: handleOperation,
     onSell: handleOperation,

@@ -1,4 +1,4 @@
-import { CalendarDate, daysIn } from './utils/date';
+import { SimpleDate, daysIn } from './utils/date';
 import { profit as _profit, snapshot as _snapshot } from './sheets-helpers';
 
 export function profit(
@@ -14,12 +14,12 @@ export function profit(
   totals: number[][],
   taxDeductions: number[][],
 ): (string | number)[] {
-  const startDate = new CalendarDate(
+  const startDate = new SimpleDate(
     portfolioStartingYear,
     portfolioStartingMonth,
     portfolioStartingDay,
   );
-  const endDate = new CalendarDate(year, month, daysIn(year, month));
+  const endDate = new SimpleDate(year, month, daysIn(year, month));
 
   const stats = _profit({
     startDate,
@@ -48,8 +48,8 @@ export function snapshot(
   quantities: number[][],
   totals: number[][],
 ): (string | number)[][] {
-  const startDate = new CalendarDate(startingYear, startingMonth, startingDay);
-  const endDate = new CalendarDate(endingYear, endingMonth, endingDay);
+  const startDate = new SimpleDate(startingYear, startingMonth, startingDay);
+  const endDate = new SimpleDate(endingYear, endingMonth, endingDay);
 
   const stats = _snapshot({
     startDate,

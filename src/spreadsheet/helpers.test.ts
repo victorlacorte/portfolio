@@ -2,7 +2,7 @@ import faker from 'faker';
 
 import { statsFrom } from 'src/finance';
 
-import { CalendarDate } from '../utils/date';
+import { SimpleDate } from '../utils/date';
 import {
   irpfHelper,
   makeTransactions,
@@ -140,7 +140,7 @@ describe('Sheets helpers', () => {
   test('sanitizeDates', () => {
     expect(
       sanitizeDates([[new Date(2020, 0, 1)], [new Date(2020, 0, 1)], , ,]),
-    ).toEqual([new CalendarDate(2020, 1, 1), new CalendarDate(2020, 1, 1)]);
+    ).toEqual([new SimpleDate(2020, 1, 1), new SimpleDate(2020, 1, 1)]);
   });
 
   test('sanitizeTickers', () => {
@@ -162,8 +162,8 @@ describe('Sheets helpers', () => {
   describe('profit', () => {
     test('A single buy transaction, so no profit', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 1),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 1),
         dates: [[new Date(2020, 0, 1)]],
         tickers: [['foo1']],
         operations: [['buy']],
@@ -184,8 +184,8 @@ describe('Sheets helpers', () => {
 
     test('A couple of buy transactions, so no profit', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 2),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1), new Date(2020, 0, 1)]],
         tickers: [['foo1', 'foo1']],
         operations: [['buy', 'buy']],
@@ -206,8 +206,8 @@ describe('Sheets helpers', () => {
 
     test('Buy and sell transactions, but 0 profit', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 2),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1), new Date(2020, 0, 1)]],
         tickers: [['foo1', 'foo1']],
         operations: [['buy', 'sell']],
@@ -228,8 +228,8 @@ describe('Sheets helpers', () => {
 
     test('Buy and sell transactions, with profit', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 2),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1), new Date(2020, 0, 1)]],
         tickers: [['foo1', 'foo1']],
         operations: [['buy', 'sell']],
@@ -250,8 +250,8 @@ describe('Sheets helpers', () => {
 
     test('Sell transaction with no tax deduction', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 2),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1), new Date(2020, 0, 1)]],
         tickers: [['foo1', 'foo1']],
         operations: [['buy', 'sell']],
@@ -267,8 +267,8 @@ describe('Sheets helpers', () => {
   describe('snapshot', () => {
     test('Opens a position with a single ticker', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 1),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 1),
         dates: [[new Date(2020, 0, 1)]],
         tickers: [['foo1']],
         operations: [['buy']],
@@ -293,8 +293,8 @@ describe('Sheets helpers', () => {
 
     test('Opens a position with different tickers', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 2),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1)], [new Date(2020, 0, 2)]],
         tickers: [['foo1'], ['foo2']],
         operations: [['buy'], ['buy']],
@@ -328,8 +328,8 @@ describe('Sheets helpers', () => {
 
     test('Opens and closes a position', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 2),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 2),
         dates: [[new Date(2020, 0, 1)], [new Date(2020, 0, 2)]],
         tickers: [['foo1'], ['foo1']],
         operations: [['buy'], ['sell']],
@@ -355,8 +355,8 @@ describe('Sheets helpers', () => {
 
     test('Opens a position with different tickers, then closes one of them', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 2),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 2),
         dates: [
           [new Date(2020, 0, 1)],
           [new Date(2020, 0, 1)],
@@ -395,8 +395,8 @@ describe('Sheets helpers', () => {
 
     test('Opens and closes a position, then reopens it', () => {
       const stats = {
-        startDate: new CalendarDate(2020, 1, 1),
-        endDate: new CalendarDate(2020, 1, 3),
+        startDate: new SimpleDate(2020, 1, 1),
+        endDate: new SimpleDate(2020, 1, 3),
         dates: [
           [new Date(2020, 0, 1)],
           [new Date(2020, 0, 2)],

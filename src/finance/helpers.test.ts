@@ -1,6 +1,6 @@
 import faker from 'faker';
 
-import { CalendarDate } from 'src/utils/date';
+import { SimpleDate } from 'src/utils/date';
 import type { Operation, Transaction as _Transaction } from 'src/types';
 
 import Transaction from './transaction';
@@ -8,15 +8,16 @@ import { statsFrom } from './helpers';
 
 const limit = { min: 1, max: 100 };
 
-const date = new CalendarDate(2020, 1, 1);
+const date = SimpleDate.make({ year: 2020, month: 1, day: 1 });
 const ticker = faker.random.word().toLowerCase();
 const quantity = faker.random.number(limit);
+// const quantity = 100;
 const averagePrice = faker.random.float(limit);
 const transactionTax = faker.random.float(limit);
 const taxDeduction = faker.random.float(limit);
 
 const makeTransaction = (operation: Operation): _Transaction =>
-  new Transaction({
+  Transaction.make({
     date,
     ticker,
     operation,
@@ -81,16 +82,16 @@ describe('statsFrom', () => {
 
     const args = {
       transactions: [
-        new Transaction({
-          date: new CalendarDate(2020, 1, 1),
+        Transaction.make({
+          date: SimpleDate.make(2020, 1, 1),
           ticker,
           operation: 'buy',
           quantity: 1,
           averagePrice,
           transactionTax,
         }),
-        new Transaction({
-          date: new CalendarDate(2020, 1, 2),
+        Transaction.make({
+          date: SimpleDate.make(2020, 1, 2),
           ticker,
           operation: 'sell',
           quantity: 2,
@@ -114,16 +115,16 @@ describe('statsFrom', () => {
 
     const args = {
       transactions: [
-        new Transaction({
-          date: new CalendarDate(2020, 1, 1),
+        Transaction.make({
+          date: SimpleDate.make(2020, 1, 1),
           ticker: 'foo1',
           operation: 'buy',
           quantity,
           averagePrice,
           transactionTax,
         }),
-        new Transaction({
-          date: new CalendarDate(2020, 1, 2),
+        Transaction.make({
+          date: SimpleDate.make(2020, 1, 2),
           ticker: 'foo2',
           operation: 'sell',
           quantity,

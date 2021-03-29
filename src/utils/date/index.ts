@@ -1,2 +1,2 @@
-export { default as CalendarDate } from './calendarDate';
+export { default as SimpleDate } from './simpleDate';
 export * from './helpers';

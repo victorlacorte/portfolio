@@ -1,14 +1,14 @@
 import type {
-  CalendarDate,
+  SimpleDate,
   Operation,
   Transaction as _Transaction,
-  TransactionParams,
+  TransactionBase,
 } from 'src/types';
 
 import { validateTransaction } from './validation';
 
 export default class Transaction implements _Transaction {
-  static make(params: TransactionParams): _Transaction {
+  static make(params: TransactionBase): _Transaction {
     const {
       date,
       ticker,
@@ -35,7 +35,7 @@ export default class Transaction implements _Transaction {
   }
 
   private constructor(
-    private readonly _date: CalendarDate,
+    private readonly _date: SimpleDate,
     private readonly _ticker: string,
     private readonly _operation: Operation,
     private readonly _quantity: number,
@@ -45,7 +45,7 @@ export default class Transaction implements _Transaction {
     private readonly _taxDeduction?: number,
   ) {}
 
-  get date(): CalendarDate {
+  get date(): SimpleDate {
     return this._date;
   }
 
@@ -77,7 +77,7 @@ export default class Transaction implements _Transaction {
     return this._taxDeduction;
   }
 
-  toJSON(): TransactionParams {
+  toJSON(): TransactionBase {
     return {
       date: this.date,
       ticker: this.ticker,

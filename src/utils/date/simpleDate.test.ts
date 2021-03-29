@@ -1,20 +1,22 @@
-import CalendarDate from './calendarDate';
+import type { DateBase } from 'src/types';
+import SimpleDate from './simpleDate';
 
-describe('CalendarDate', () => {
+describe('SimpleDate', () => {
   it('Throws when provided an invalid date', () => {
-    expect(() => new CalendarDate(2020, 2, 30)).toThrow();
+    expect(() => SimpleDate.make({ year: 2020, month: 2, day: 30 })).toThrow();
   });
 
-  it('fromJSDate(x.toJSDate()) === x, x: CalendarDate', () => {
-    const dates = [
+  it('fromJSDate(x.toJSDate()) === x, x: SimpleDate', () => {
+    const dates: DateBase[] = [
       { year: 2020, month: 1, day: 1 },
       { year: 2020, month: 1, day: 2 },
       { year: 2020, month: 1, day: 10 },
     ];
 
-    dates.forEach(({ year, month, day }) => {
-      const cd = new CalendarDate(year, month, day);
-      expect(CalendarDate.fromJSDate(cd.toJSDate())).toEqual(cd);
+    dates.forEach((d) => {
+      const sd = SimpleDate.make(d);
+
+      expect(SimpleDate.fromJSDate(sd.toJSDate())).toEqual(sd);
     });
   });
 
@@ -26,12 +28,9 @@ describe('CalendarDate', () => {
     ];
 
     dates.forEach((date) => {
-      const cd = CalendarDate.fromJSDate(date);
+      const cd = SimpleDate.fromJSDate(date);
+
       expect(cd.toJSDate()).toStrictEqual(date);
     });
   });
-
-  it('valid', () => {});
-
-  it('toString', () => {});
 });
