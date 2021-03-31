@@ -19,7 +19,6 @@ const makeDefaultStats = (): Stats[keyof Stats] => ({
   },
 });
 
-// TODO onBuy and onSell should have different parameters. Need to inspect usage to better understand it
 export default class Portfolio {
   private readonly _stats: Stats = {};
 
@@ -112,8 +111,7 @@ export default class Portfolio {
 
     if (
       !Object.prototype.hasOwnProperty.call(this._stats, ticker) ||
-      quantity > this._stats[ticker].purchased.quantity ||
-      !taxDeduction
+      quantity > this._stats[ticker].purchased.quantity
     ) {
       throw new Error(`Invalid sell transaction: ${JSON.stringify(t)}`);
     }

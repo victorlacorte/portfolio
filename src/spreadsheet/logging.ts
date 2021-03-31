@@ -22,9 +22,10 @@ export function profitMessage(params: ProfitMessage): string {
   return `${params.date}: [${ticker}] quantity=${quantity}, total=${total}, profit=${profit} (${profitPercent}%), tax=${taxDeduction}`;
 }
 
-type SnapshotMessage = {
-  total: number;
-} & Omit<Transaction, 'ticker' | 'taxDeduction' | 'transactionTax'>;
+type SnapshotMessage = Omit<
+  Transaction,
+  'ticker' | 'taxDeduction' | 'transactionTax'
+>;
 
 // We don't need to include the ticker since it is the key of this kind of message
 export function snapshotMessage(params: SnapshotMessage): string {

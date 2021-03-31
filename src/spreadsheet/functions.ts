@@ -3,7 +3,6 @@ import type { BuySellEvent, Transaction } from 'src/types';
 
 import Logger from '../utils/logging';
 import { mul, sub } from '../utils/number';
-import { expectedPositive } from '../utils/messages';
 import { profitMessage, snapshotMessage } from './logging';
 
 type ProfitReturn = {
@@ -26,9 +25,7 @@ export function profit(
 
   // `taxDeduction` is not part of the profit calculation
   const handleSell: BuySellEvent = (t, stats) => {
-    if (t.taxDeduction < 0) {
-      throw new Error(expectedPositive(t.taxDeduction));
-    }
+    if (!t.total) throw new Error(`Expected 'total' in ${t}`);
 
     if (t.date.year === year && t.date.month === month) {
       const purchasedValue = mul(stats[t.ticker].averagePrice, t.quantity);
@@ -43,6 +40,7 @@ export function profit(
           ...t,
           purchasedValue,
           profit: currProfit,
+          total: t.total,
         }),
       );
     }
@@ -59,7 +57,8 @@ export function profit(
 export function snapshot(transactions: Transaction[]) {
   const control: { [ticker: string]: Logger } = {};
 
-  const handleOperation: BuySellEvent = (t, stats) => {
+  // TODO we could also calculate profit on the trade
+  const handleOperation: BuySellEvent = (t) => {
     if (!Object.prototype.hasOwnProperty.call(control, t.ticker)) {
       control[t.ticker] = new Logger();
     }
@@ -74,7 +73,10 @@ export function snapshot(transactions: Transaction[]) {
   });
 
   return Object.keys(control).map((ticker) => {
-    if (Object.prototype.hasOwnProperty.call(stats, ticker)) {
+    if (
+      Object.prototype.hasOwnProperty.call(stats, ticker) &&
+      stats[ticker].averagePrice
+    ) {
       return {
         ticker,
         purchasedQuantity: stats[ticker].purchased.quantity,

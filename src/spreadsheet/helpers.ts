@@ -64,7 +64,7 @@ export function sanitizeNumbers(x: string[]): number[] {
   return x.map((n, idx) => {
     const valid = Number(n);
 
-    if (!isFinite(valid)) {
+    if (!Number.isFinite(valid)) {
       throw new Error(expectedFinite(valid, idx + 1));
     }
 
@@ -75,40 +75,43 @@ export function sanitizeNumbers(x: string[]): number[] {
 export function makeTransactions(
   params: SpreadsheetTransaction,
 ): _Transaction[] {
-  const date = sanitizeDates(sanitizeNamedRange(params.date));
-  const ticker = sanitizeNamedRange(params.ticker);
-  const operation = sanitizeOperations(sanitizeNamedRange(params.operation));
-  const quantity = sanitizeNumbers(sanitizeNamedRange(params.quantity));
-  const averagePrice = sanitizeNumbers(sanitizeNamedRange(params.averagePrice));
-  const transactionTax = sanitizeNumbers(
+  const dates = sanitizeDates(sanitizeNamedRange(params.date));
+  const tickers = sanitizeNamedRange(params.ticker);
+  const operations = sanitizeOperations(sanitizeNamedRange(params.operation));
+  const quantities = sanitizeNumbers(sanitizeNamedRange(params.quantity));
+  const averagePrices = sanitizeNumbers(
+    sanitizeNamedRange(params.averagePrice),
+  );
+  const transactionTaxes = sanitizeNumbers(
     sanitizeNamedRange(params.transactionTax),
   );
-  const taxDeduction = sanitizeNumbers(sanitizeNamedRange(params.taxDeduction));
+  const taxDeductions = sanitizeNumbers(
+    sanitizeNamedRange(params.taxDeduction),
+  );
 
   if (
     !sameLength(
-      date,
-      ticker,
-      operation,
-      quantity,
-      averagePrice,
-      transactionTax,
-      taxDeduction,
+      dates,
+      tickers,
+      operations,
+      quantities,
+      averagePrices,
+      transactionTaxes,
+      taxDeductions,
     )
   ) {
     throw new Error(diffLengthNR);
   }
 
-  return date.map(
-    (d, idx) =>
-      new Transaction({
-        date: d,
-        ticker: ticker[idx],
-        operation: operation[idx],
-        quantity: quantity[idx],
-        averagePrice: averagePrice[idx],
-        transactionTax: transactionTax[idx],
-        taxDeduction: taxDeduction[idx],
-      }),
+  return Array.from({ length: dates.length }, (_, i) =>
+    Transaction.make({
+      date: dates[i],
+      ticker: tickers[i],
+      operation: operations[i],
+      quantity: quantities[i],
+      averagePrice: averagePrices[i],
+      transactionTax: transactionTaxes[i],
+      taxDeduction: taxDeductions[i],
+    }),
   );
 }

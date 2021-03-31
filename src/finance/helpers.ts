@@ -9,6 +9,9 @@ type StatsFrom = {
   onSell?: BuySellEvent;
 };
 
+/**
+ * Sort ascending before adding to the portfolio
+ */
 export function statsFrom({ transactions, onBuy, onSell }: StatsFrom): Stats {
   const p = Portfolio.make({ onBuy, onSell });
 
