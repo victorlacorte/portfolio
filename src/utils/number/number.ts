@@ -1,6 +1,6 @@
-import { expectedFinite } from 'src/utils/messages';
+// import { expectedFinite } from 'src/utils/messages';
 
-// mostly copied from https://github.com/adamwdraper/Numeral-js/blob/master/src/numeral.js
+// mostly adapted from https://github.com/adamwdraper/Numeral-js/blob/master/src/numeral.js
 
 /**
  * Computes the multiplier necessary to make x >= 1, effectively eliminating
@@ -59,50 +59,62 @@ export function div(...args: number[]): number {
 }
 
 /**
+ * Possibly unnecessary:
+ * numObj.toFixed([digits])
+ *
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed#Description
  */
-export function toFixed(x: number, precision: number): number {
-  const k = Math.pow(10, precision);
+// export function toFixed(x: number, precision: number): number {
+//   const k = Math.pow(10, precision);
 
-  return Math.round(x * k) / k;
-}
+//   return Math.round(x * k) / k;
+// }
 
-export function format(
-  x: number,
-  decimals = 0,
-  decimalSeparator = '.',
-  thousandsSeparator = ',',
-): string {
-  if (!isFinite(x)) {
-    throw new Error(expectedFinite(x));
-  }
+/**
+ * Possibly redundant: numObj.toLocaleString('en-US', { style: 'currency', currency: 'USD' }).slice(1)
+ */
+// export function format(
+//   x: number,
+//   decimals = 0,
+//   decimalSeparator = '.',
+//   thousandsSeparator = ',',
+// ): string {
+//   if (!isFinite(x)) {
+//     throw new Error(expectedFinite(x));
+//   }
 
-  if (!isFinite(decimals)) {
-    throw new Error(expectedFinite(decimals));
-  }
+//   if (!isFinite(decimals)) {
+//     throw new Error(expectedFinite(decimals));
+//   }
 
-  const prec = Math.abs(decimals);
-  const numAsStr = toFixed(x, prec).toString().split('.');
+//   const prec = Math.abs(decimals);
+//   const numAsStr = toFixed(x, prec).toString().split('.');
 
-  if (numAsStr[0].length > 3) {
-    numAsStr[0] = numAsStr[0].replace(
-      /\B(?=(?:\d{3})+(?!\d))/g,
-      thousandsSeparator,
-    );
-  }
+//   if (numAsStr[0].length > 3) {
+//     numAsStr[0] = numAsStr[0].replace(
+//       /\B(?=(?:\d{3})+(?!\d))/g,
+//       thousandsSeparator,
+//     );
+//   }
 
-  if ((numAsStr[1] || '').length < prec) {
-    numAsStr[1] = numAsStr[1] || '';
-    numAsStr[1] += new Array(prec - numAsStr[1].length + 1).join('0');
-  }
+//   if ((numAsStr[1] || '').length < prec) {
+//     numAsStr[1] = numAsStr[1] || '';
+//     numAsStr[1] += new Array(prec - numAsStr[1].length + 1).join('0');
+//   }
 
-  return numAsStr.join(decimalSeparator);
-}
+//   return numAsStr.join(decimalSeparator);
+// }
 
-export function toCurrency(x: number): string {
-  return format(x, 2, '.', ',');
-}
+// export function toCurrency(x: number): string {
+//   return x
+//     .toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+//     .slice(1);
+// }
 
-export function padStart(x: number, places: number, fillString = '0'): string {
-  return String(x).padStart(places, fillString);
-}
+// export function padStart(
+//   x: number,
+//   maxLength: number,
+//   fillString = '0',
+// ): string {
+//   return String(x).padStart(maxLength, fillString);
+// }

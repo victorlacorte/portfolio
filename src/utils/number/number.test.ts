@@ -2,12 +2,12 @@ import {
   add,
   correctionFactor,
   div,
-  format,
+  // format,
   mul,
   multiplier,
   sub,
-  toCurrency,
-  toFixed,
+  // toCurrency,
+  // toFixed,
 } from './number';
 
 test('multiplier', () => {
@@ -72,35 +72,35 @@ test('div', () => {
   expect(div(0.28, 0.01)).toBe(28);
 });
 
-test('format', () => {
-  expect(format(1234.56)).toBe('1,235');
-  expect(format(1234.56, 2, ',', ' ')).toBe('1 234,56');
-  expect(format(1234.5678, 2, '.', '')).toBe('1234.57');
-  expect(format(67, 2, ',', '.')).toBe('67,00');
-  expect(format(1000)).toBe('1,000');
-  expect(format(67.311, 2)).toBe('67.31');
-  expect(format(1000.55, 1)).toBe('1,000.6');
-  expect(format(67000, 5, ',', '.')).toBe('67.000,00000');
-  expect(format(0.9, 0)).toBe('1');
-  expect(format(1.2, 2)).toBe('1.20');
-  expect(format(1.2, 4)).toBe('1.2000');
-  expect(format(1.2, 3)).toBe('1.200');
-});
+// test('format', () => {
+//   expect(format(1234.56)).toBe('1,235');
+//   expect(format(1234.56, 2, ',', ' ')).toBe('1 234,56');
+//   expect(format(1234.5678, 2, '.', '')).toBe('1234.57');
+//   expect(format(67, 2, ',', '.')).toBe('67,00');
+//   expect(format(1000)).toBe('1,000');
+//   expect(format(67.311, 2)).toBe('67.31');
+//   expect(format(1000.55, 1)).toBe('1,000.6');
+//   expect(format(67000, 5, ',', '.')).toBe('67.000,00000');
+//   expect(format(0.9, 0)).toBe('1');
+//   expect(format(1.2, 2)).toBe('1.20');
+//   expect(format(1.2, 4)).toBe('1.2000');
+//   expect(format(1.2, 3)).toBe('1.200');
+// });
 
-test('toCurrency', () => {
-  expect(toCurrency(0)).toBe('0.00');
-  expect(toCurrency(1000)).toBe('1,000.00');
-  expect(toCurrency(1000.5)).toBe('1,000.50');
-  expect(toCurrency(1000.499)).toBe('1,000.50');
-  expect(toCurrency(-1000.499)).toBe('-1,000.50');
-});
+// test('toCurrency', () => {
+//   expect(toCurrency(0)).toBe('0.00');
+//   expect(toCurrency(1000)).toBe('1,000.00');
+//   expect(toCurrency(1000.5)).toBe('1,000.50');
+//   expect(toCurrency(1000.499)).toBe('1,000.50');
+//   expect(toCurrency(-1000.499)).toBe('-1,000.50');
+// });
 
-test('toFixed', () => {
-  expect(toFixed(1 / 3, 3)).toBe(0.333);
-  expect(toFixed(0.1, 0)).toBe(0);
-  expect(toFixed(0.1, 1)).toBe(0.1);
-  expect(toFixed(0.1, 2)).toBe(0.1);
-  expect(toFixed(0.5, 0)).toBe(1);
-  expect(toFixed(0.5, 1)).toBe(0.5);
-  expect(toFixed(0.55, 1)).toBe(0.6);
-});
+// test('toFixed', () => {
+//   expect(toFixed(1 / 3, 3)).toBe(0.333);
+//   expect(toFixed(0.1, 0)).toBe(0);
+//   expect(toFixed(0.1, 1)).toBe(0.1);
+//   expect(toFixed(0.1, 2)).toBe(0.1);
+//   expect(toFixed(0.5, 0)).toBe(1);
+//   expect(toFixed(0.5, 1)).toBe(0.5);
+//   expect(toFixed(0.55, 1)).toBe(0.6);
+// });
