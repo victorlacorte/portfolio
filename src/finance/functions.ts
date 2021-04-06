@@ -12,14 +12,14 @@ export function averagePrice(
   t: Transaction,
   p?: Omit<PortfolioEntry, 'date'>,
 ): number {
-  const tAvgPrice = div(add(mul(t.quantity, t.price), t.tax), t.quantity);
+  const tTotal = add(mul(t.quantity, t.price), t.tax);
 
   if (p === undefined) {
-    return tAvgPrice;
+    return div(tTotal, t.quantity);
   }
 
   return div(
-    add(mul(p.quantity, p.price), tAvgPrice),
+    add(mul(p.quantity, p.price), tTotal),
     add(p.quantity, t.quantity),
   );
 }

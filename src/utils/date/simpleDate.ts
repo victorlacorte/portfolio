@@ -1,23 +1,23 @@
-import { padStart } from 'src/utils/number';
-import type { DateBase, SimpleDate as _SimpleDate } from 'src/types';
+import type { SimpleDate as _SimpleDate } from 'src/types';
+
+import { padStart } from '../number';
 
 import { validate } from './helpers';
 
-/**
- * YYYY/MM/DD convention
- */
+export type YMD = Omit<_SimpleDate, 'toJSDate'>;
+
 export default class SimpleDate implements _SimpleDate {
-  static make({ year, month, day }: DateBase): _SimpleDate;
+  static make({ year, month, day }: YMD): _SimpleDate;
   static make(year: number, month: number, day: number): _SimpleDate;
   static make(
-    dateBaseOrYear: DateBase | number,
+    fullDateOrYear: YMD | number,
     month?: number,
     day?: number,
   ): _SimpleDate {
-    if (typeof dateBaseOrYear === 'number') {
-      return validate(new this(dateBaseOrYear, month, day));
+    if (typeof fullDateOrYear === 'number') {
+      return validate(new this(fullDateOrYear, month, day));
     } else {
-      const { year, month, day } = dateBaseOrYear;
+      const { year, month, day } = fullDateOrYear;
 
       return validate(new this(year, month, day));
     }
@@ -49,7 +49,7 @@ export default class SimpleDate implements _SimpleDate {
     return new Date(this.year, this.month - 1, this.day);
   }
 
-  toJSON(): DateBase {
+  toJSON(): YMD {
     return { year: this.year, month: this.month, day: this.day };
   }
 

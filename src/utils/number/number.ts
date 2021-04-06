@@ -111,10 +111,10 @@ export function div(...args: number[]): number {
 //     .slice(1);
 // }
 
-// export function padStart(
-//   x: number,
-//   maxLength: number,
-//   fillString = '0',
-// ): string {
-//   return String(x).padStart(maxLength, fillString);
-// }
+export function padStart(
+  x: number,
+  maxLength: number,
+  fillString = '0',
+): string {
+  return String(x).padStart(maxLength, fillString);
+}

@@ -1,5 +1,5 @@
-import type { DateBase } from 'src/types';
 import SimpleDate from './simpleDate';
+import type { YMD } from './simpleDate';
 
 describe('SimpleDate', () => {
   it('Throws when provided an invalid date', () => {
@@ -7,7 +7,7 @@ describe('SimpleDate', () => {
   });
 
   it('fromJSDate(x.toJSDate()) === x, x: SimpleDate', () => {
-    const dates: DateBase[] = [
+    const dates: YMD[] = [
       { year: 2020, month: 1, day: 1 },
       { year: 2020, month: 1, day: 2 },
       { year: 2020, month: 1, day: 10 },

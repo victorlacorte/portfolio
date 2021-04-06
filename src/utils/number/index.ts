@@ -1,1 +1,1 @@
-export { add, div, mul, sub } from './number';
+export { add, div, mul, padStart, sub } from './number';
