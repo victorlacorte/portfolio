@@ -5,8 +5,11 @@ import { add, div, mul } from '../utils/number';
 
 import { averagePrice, profit, profitPercent, sellTotal } from './functions';
 
-// The date is irrelevant to all tests
+// TODO this test file is probably going to be removed. We test it indirectly through the portfolio-wrapper
+
+// The date and ticker are irrelevant to all tests
 const date = SimpleDate.make(2020, 1, 1);
+const ticker = faker.random.alphaNumeric(5);
 
 const makeQuantity = (): number => faker.random.number({ min: 1 });
 const makePrice = (): number => faker.random.float({ min: 0 });
@@ -28,6 +31,7 @@ describe('finance/functions', () => {
           expect(
             averagePrice({
               date,
+              ticker,
               price,
               quantity: makeQuantity(),
               tax: 0,
@@ -50,6 +54,7 @@ describe('finance/functions', () => {
           expect(
             averagePrice({
               date,
+              ticker,
               price,
               quantity,
               tax,
@@ -70,6 +75,7 @@ describe('finance/functions', () => {
             averagePrice(
               {
                 date,
+                ticker,
                 price,
                 quantity,
                 tax: 0,
@@ -105,6 +111,7 @@ describe('finance/functions', () => {
             averagePrice(
               {
                 date,
+                ticker,
                 ...t,
               },
               p,
@@ -115,3 +122,7 @@ describe('finance/functions', () => {
     });
   });
 });
+
+// TODO sellTotal
+
+// TODO profit

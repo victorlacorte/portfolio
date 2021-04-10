@@ -1,5 +1,5 @@
 import { add, div, mul, sub } from '../utils/number';
-import type { Transaction, PortfolioEntry } from '../types';
+import type { PortfolioEntry, Transaction } from '../types';
 
 export function averagePrice(t: Transaction): number;
 
