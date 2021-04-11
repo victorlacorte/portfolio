@@ -1,21 +1,27 @@
-# Google Sheets Portfolio
+# Google Sheets Portfolio Management
 
 ## Custom spreadsheet deployment
 
-The current CD will deploy to a Spreadsheet generated with secrets from the
-repository, so in order to deploy to a custom one proceed as follows:
+The CD pipeline is configured to deploy to a particular spreadsheet, specified
+with secrets `CLASP_AUTH` and `CLASP_ID`. In order to deploy to a custom one,
+proceed as follows:
 
-- Create a file named `.clasp.json` in the root with the desired
+- `clasp login` (or have an authorization file `.clasprc.json` present)
+
+- Create a file named `.clasp.json` in the root dir with the desired
   [`scriptId`](https://github.com/google/clasp/#scriptid-required)
 
 - `npm run validate && npm run build && npm run clasp:push`
 
-## Google Sheets Data Types
+## Webpack and Apps Script details
 
-## Open questions
+`src/api.js` exposes all functions callable from the spreadsheet. Notice it
+accesses the `Portfolio` variable created during
+[build](https://webpack.js.org/configuration/output/#expose-a-variable): this
+was the simplest workaround to the fact that, currently, Google Apps Script
+requires all functions to be _explicitly_ present in the generated `*.gs` files
+(e.g. exposing the entry point via object assignment, `type: this`, does not
+work).
 
-## TODO
-
-- The snapshot feature still needs tuning in order to easily aid during tax
-  declarations e.g. "NA entries" should be removed drom such snapshots since
-  they are mostly useless for this goal.
+In the future, this file could be transpiled separately and the `Portfolio`
+variable could be type checked in order to provide a better usage experience.

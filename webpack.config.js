@@ -1,11 +1,16 @@
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: './src/index.ts',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'this',
+    clean: true,
+    library: {
+      type: 'var',
+      name: 'Portfolio',
+    },
   },
   mode: 'production',
   module: {
@@ -25,4 +30,5 @@ module.exports = {
       src: path.resolve(__dirname, 'src'),
     },
   },
+  plugins: [new CopyPlugin({ patterns: ['src/api.js'] })],
 };
