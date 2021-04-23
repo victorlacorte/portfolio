@@ -3,7 +3,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "target": "ES2019",
-    "lib": ["ESNext"],
+    "lib": ["ES2020"],
     "moduleResolution": "Node",
     "esModuleInterop": true
   }
