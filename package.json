@@ -35,5 +35,8 @@
     "typescript": "3.8.2",
     "webpack": "^5.24.4",
     "webpack-cli": "^4.5.0"
+  },
+  "dependencies": {
+    "ramda": "^0.27.1"
   }
 }
