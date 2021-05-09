@@ -66,6 +66,10 @@ export default class implements Portfolio {
       date: t.date,
       price: lastEntry ? averagePrice(t, lastEntry) : averagePrice(t),
       quantity: lastEntry ? add(t.quantity, lastEntry.quantity) : t.quantity,
+      irrf: 0,
+      profit: 0,
+      profitPercent: 0,
+      soldTotal: 0,
     });
   }
 }

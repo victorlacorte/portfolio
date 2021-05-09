@@ -30,12 +30,12 @@ describe('spreadsheet/adapters', () => {
         Array [
           "foo1",
           "2020/01/01",
-          "",
+          0,
           1.0049,
-          "",
-          "",
+          0,
+          0,
           200,
-          "",
+          0,
         ],
         Array [
           "foo1",
@@ -50,12 +50,12 @@ describe('spreadsheet/adapters', () => {
         Array [
           "foo1",
           "2020/01/01",
-          "",
+          0,
           0.7574,
-          "",
-          "",
+          0,
+          0,
           200,
-          "",
+          0,
         ],
       ]
     `);

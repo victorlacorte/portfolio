@@ -17,26 +17,18 @@ export type Transaction = {
   irrf?: number; // individual income tax?
 };
 
-export type PositionEntryBase = {
+export type PositionEntry = {
   date: Transaction['date'];
   quantity: Transaction['quantity'];
   price: Transaction['price'];
-};
-
-type PositionSellEntryBase = {
   irrf: Transaction['irrf'];
   soldTotal: number;
   profit: number;
   profitPercent: number;
 };
 
-export type PositionEntry = PositionEntryBase &
-  Partial<Record<keyof PositionSellEntryBase, never>>;
-
-export type PositionSellEntry = PositionSellEntryBase & PositionEntryBase;
-
 export type Position = {
-  [ticker: string]: (PositionEntry | PositionSellEntry)[];
+  [ticker: string]: PositionEntry[];
 };
 
 export type Portfolio = {

@@ -1,4 +1,5 @@
 import { operations } from './constants';
+import { valuesFrom } from './helpers';
 import type { Operation } from './types';
 
 import Portfolio from '../finance/portfolio';
@@ -88,14 +89,6 @@ export function position(
     });
 
   return Object.entries(portfolio.position).flatMap(([k, v]) =>
-    v.map((props) => [
-      k,
-      ...Object.keys({
-        ...defaultPortfolioSellEntry,
-        ...props,
-      })
-        .sort() // ensure consistent ordering
-        .map((propKey) => props[propKey] ?? ''),
-    ]),
+    v.map((props) => [k, ...valuesFrom(props)]),
   );
 }

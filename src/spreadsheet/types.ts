@@ -39,3 +39,17 @@ export type Operation = typeof operations[number];
 //   taxes: SanitizedRange<number>;
 //   irrfs: SanitizedRange<number>;
 // };
+
+type OptionalNumber = '' | number;
+
+// Ticker, Date, IRRF, Price, Profit, ProfitPercent, Quantity, SoldTotal
+type SheetPosition = [
+  string,
+  string,
+  OptionalNumber,
+  number,
+  OptionalNumber,
+  OptionalNumber,
+  number,
+  OptionalNumber,
+][];
