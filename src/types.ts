@@ -1,3 +1,7 @@
+import { buyEntryKeys, operations, sellEntryKeys } from './constants';
+
+export type Operation = typeof operations[number];
+
 // TODO review which types are actually present in the project
 // Some of these might make sense only in the src/finance context
 export type SimpleDate = {
@@ -17,19 +21,64 @@ export type Transaction = {
   irrf?: number; // individual income tax?
 };
 
+// TODO buyPrice = (price * quantity + tax) / quantity
+// TODO notice we don't enforce much with this type: we can enter weird
+// combinations of buy/sell info in the transaction
+// TODO we need to have column names somewhere
+
+const numberColumnNames = [
+  'quantity',
+  'price',
+  'buyQuantity',
+  'buyTotal',
+  'sellIrrf',
+  'sellQuantity',
+  'sellTotal',
+  'sellProfit',
+  'sellProfitPercent',
+] as const;
+
+// const stringColumnNames = ['date'] as const;
+
+// export type PositionEntry = {
+//   date: Transaction['date'];
+//   quantity: Transaction['quantity'];
+//   price: Transaction['price'];
+//   buyQuantity: Transaction['quantity'];
+//   buyTotal: number;
+//   sellIrrf: Transaction['irrf'];
+//   sellQuantity: Transaction['quantity'];
+//   sellTotal: number;
+//   sellProfit: number;
+//   sellProfitPercent: number;
+// };
+
+// Indexed by ticker
+// type BuyEntry = {
+//   buyQuantity: Transaction['quantity'];
+//   buyTotal: number;
+// };
+type BuyEntry = Record<typeof buyEntryKeys[number], number>;
+type SellEntry = Record<typeof sellEntryKeys[number], number>;
+
 export type PositionEntry = {
   date: Transaction['date'];
   quantity: Transaction['quantity'];
   price: Transaction['price'];
-  irrf: Transaction['irrf'];
-  soldTotal: number;
-  profit: number;
-  profitPercent: number;
-};
+} & (
+  | (BuyEntry & Partial<Record<keyof SellEntry, never>>)
+  | (Partial<Record<keyof BuyEntry, never>> & SellEntry)
+);
 
-export type Position = {
-  [ticker: string]: PositionEntry[];
-};
+// export type PositionEntry = {
+//   [key in typeof numberColumnNames[number]]: number;
+// } & { date: Transaction['date'] }; // { [key in typeof stringColumnNames[number]]: string };
+
+// export type Position = {
+//   [ticker: string]: PositionEntry[];
+// };
+
+export type Position = Record<string, PositionEntry[]>;
 
 export type Portfolio = {
   position: Position;

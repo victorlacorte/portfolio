@@ -21,9 +21,7 @@ declare function position(
 // Trivial function: obtain the last entry of every ticker, multiply quantity
 // and price and return.
 declare function openPosition(
-  years: unknown[][],
-  months: unknown[][],
-  days: unknown[][],
+  dates: unknown[][],
   tickers: unknown[][],
   quantities: unknown[][],
   prices: unknown[][],
@@ -35,12 +33,18 @@ declare function openPosition(
 // The conclusion is that the sold total should also belong to the
 // `Portfolio.position` entry since it should be the single source of truth.
 declare function profit(
-  years: unknown[][],
-  months: unknown[][],
-  days: unknown[][],
+  dates: unknown[][],
   tickers: unknown[][],
   irrfs: unknown[][],
   soldTotals: unknown[][],
   profits: unknown[][],
   profitPercents: unknown[][],
+);
+
+declare function irpf(
+  year: unknown,
+  dates: unknown[][],
+  tickers: unknown[][],
+  quantities: unknown[][],
+  soldTotals: unknown[][],
 );

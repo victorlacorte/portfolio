@@ -1,6 +1,31 @@
-// import { expectedFinite } from 'src/utils/messages';
+import * as R from 'ramda';
+
+type DecimalAdjust = (x: number, digits?: number) => number;
 
 // mostly adapted from https://github.com/adamwdraper/Numeral-js/blob/master/src/numeral.js
+
+// https://stackoverflow.com/a/48764436
+
+function isRound(x: number, digits: number): boolean {
+  const p = Math.pow(10, digits);
+
+  return Math.round(x * p) / p === x;
+}
+
+function _decimalAdjust(type: keyof Math, x: number, digits = 0): number {
+  if (isRound(x, digits)) return x;
+
+  const p = Math.pow(10, digits);
+  const m = x * p * (1 + Number.EPSILON);
+
+  return Math[type as string](m) / p;
+}
+
+const decimalAdjust = R.curry(_decimalAdjust);
+
+const round: DecimalAdjust = decimalAdjust('round');
+
+export const trunc: DecimalAdjust = decimalAdjust('trunc');
 
 /**
  * Computes the multiplier necessary to make x >= 1, effectively eliminating
@@ -28,8 +53,7 @@ export function add(...args: number[]): number {
   const corrFactor = correctionFactor(...args);
 
   return (
-    args.reduce((acc, curr) => acc + Math.round(corrFactor * curr), 0) /
-    corrFactor
+    args.reduce((acc, curr) => acc + round(corrFactor * curr), 0) / corrFactor
   );
 }
 
@@ -44,8 +68,8 @@ export function mul(...args: number[]): number {
     const corrFactor = correctionFactor(acc, curr);
 
     return (
-      (Math.round(corrFactor * acc) * Math.round(corrFactor * curr)) /
-      Math.round(corrFactor ** 2)
+      (round(corrFactor * acc) * round(corrFactor * curr)) /
+      round(corrFactor ** 2)
     );
   }, 1);
 }
@@ -54,7 +78,7 @@ export function div(...args: number[]): number {
   return args.reduce((acc, curr) => {
     const corrFactor = correctionFactor(acc, curr);
 
-    return Math.round(corrFactor * acc) / Math.round(corrFactor * curr);
+    return round(corrFactor * acc) / round(corrFactor * curr);
   });
 }
 
@@ -125,8 +149,8 @@ export function padStart(
  * @param x A numeric expression
  * @param digits The maximum number of decimal digits
  */
-export function trunc(x: number, digits = 0): number {
-  const power = Math.pow(10, digits);
+// export function trunc(x: number, digits = 0): number {
+//   const power = Math.pow(10, digits);
 
-  return Math.trunc(x * power) / power;
-}
+//   return Math.trunc(x * power) / power;
+// }

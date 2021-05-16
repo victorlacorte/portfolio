@@ -1,8 +1,15 @@
 import { add } from '../utils/number';
 import type { Portfolio, Position, Transaction } from '../types';
 
-import { averagePrice, profit, profitPercent, sellTotal } from './functions';
+import {
+  averagePrice,
+  buyTotal,
+  profit,
+  profitPercent,
+  sellTotal,
+} from './functions';
 
+// TODO truncate IRRF quantities
 export default class implements Portfolio {
   private readonly _position: Position = {};
 
@@ -47,10 +54,11 @@ export default class implements Portfolio {
       price: lastEntry.price,
       // t.quantity < 0
       quantity: add(lastEntry.quantity, t.quantity),
-      irrf: t.irrf, // TODO needs to be > 0
-      soldTotal: sellTotal(t),
-      profit: profit(t, lastEntry),
-      profitPercent: profitPercent(t, lastEntry),
+      sellIrrf: t.irrf, // TODO needs to be > 0
+      sellProfit: profit(t, lastEntry),
+      sellProfitPercent: profitPercent(t, lastEntry),
+      sellQuantity: Math.abs(t.quantity),
+      sellTotal: sellTotal(t),
     });
   }
 
@@ -66,10 +74,8 @@ export default class implements Portfolio {
       date: t.date,
       price: lastEntry ? averagePrice(t, lastEntry) : averagePrice(t),
       quantity: lastEntry ? add(t.quantity, lastEntry.quantity) : t.quantity,
-      irrf: 0,
-      profit: 0,
-      profitPercent: 0,
-      soldTotal: 0,
+      buyQuantity: t.quantity,
+      buyTotal: buyTotal(t),
     });
   }
 }

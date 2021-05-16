@@ -1,10 +1,9 @@
-import { operations } from './constants';
+import { operations, positionColumnNames } from '../constants';
 import { valuesFrom } from './helpers';
-import type { Operation } from './types';
 
 import Portfolio from '../finance/portfolio';
 import SimpleDate from '../utils/date';
-import type { SimpleDate as _SimpleDate } from '../types';
+import type { Operation, SimpleDate as _SimpleDate } from '../types';
 
 /**
  * Parse information from and to the spreadsheet context
@@ -88,7 +87,11 @@ export function position(
       });
     });
 
-  return Object.entries(portfolio.position).flatMap(([k, v]) =>
-    v.map((props) => [k, ...valuesFrom(props)]),
-  );
+  // TODO return header from v[0]?
+  return [
+    ['ticker', ...positionColumnNames.sort()],
+    ...Object.entries(portfolio.position).flatMap(([k, v]) =>
+      v.map((props) => [k, ...valuesFrom(props, positionColumnNames, 0)]),
+    ),
+  ];
 }

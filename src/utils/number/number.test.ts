@@ -71,6 +71,7 @@ test('div', () => {
   expect(div(-100, 200)).toBe(-0.5);
   expect(div(5.3, 0.1)).toBe(53);
   expect(div(0.28, 0.01)).toBe(28);
+  expect(div(201, 200)).toBe(1.005);
 });
 
 // test('format', () => {
