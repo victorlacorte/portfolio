@@ -15,9 +15,9 @@ const makeQuantity = (): number => faker.datatype.number({ min: 1 });
 const makePrice = (): number => faker.datatype.float({ min: 0 });
 const makeTax = (): number => faker.datatype.float({ min: 0 });
 
-function* repeat<T>(times: number, fn: () => T): Generator<T> {
+function* repeat<T>(times: number, function_: () => T): Generator<T> {
   while (times--) {
-    yield fn();
+    yield function_();
   }
 }
 

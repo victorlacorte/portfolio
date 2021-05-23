@@ -45,6 +45,10 @@ declare function irpf(
   year: unknown,
   dates: unknown[][],
   tickers: unknown[][],
-  quantities: unknown[][],
-  soldTotals: unknown[][],
+  buyQuantities: unknown[][],
+  buyTotals: unknown[][],
+  sellIrrfs: unknown[][],
+  sellQuantities: unknown[][],
+  sellProfits: unknown[][],
+  sellTotals: unknown[][],
 );

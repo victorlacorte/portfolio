@@ -4,7 +4,7 @@ import { padStart } from '../number';
 
 import { validate } from './helpers';
 
-export type YMD = Omit<_SimpleDate, 'toJSDate'>;
+export type YMD = Pick<_SimpleDate, 'year' | 'month' | 'day'>;
 
 export default class SimpleDate implements _SimpleDate {
   static make({ year, month, day }: YMD): _SimpleDate;
@@ -49,6 +49,10 @@ export default class SimpleDate implements _SimpleDate {
     return this._day;
   }
 
+  equals(s: SimpleDate): boolean {
+    return this.day == s.day && this.month == s.month && this.year == s.year;
+  }
+
   toJSDate(): Date {
     return new Date(this.year, this.month - 1, this.day);
   }
@@ -58,9 +62,9 @@ export default class SimpleDate implements _SimpleDate {
   }
 
   toString(): string {
-    const y = this.year,
-      m = padStart(this.month, 2),
-      d = padStart(this.day, 2);
+    const y = this.year;
+    const m = padStart(this.month, 2);
+    const d = padStart(this.day, 2);
 
     return `${y}/${m}/${d}`;
   }

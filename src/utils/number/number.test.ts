@@ -6,7 +6,7 @@ import {
   mul,
   multiplier,
   sub,
-  // toCurrency,
+  toUSD,
   // toFixed,
   trunc,
 } from './number';
@@ -24,7 +24,7 @@ test('correctionFactor', () => {
   expect(correctionFactor(1, 1.1)).toBe(10);
   expect(correctionFactor(1.1, 1.1)).toBe(10);
   expect(correctionFactor(1.1, 1.101)).toBe(1000);
-  expect(correctionFactor(1.1001, 1.101)).toBe(10000);
+  expect(correctionFactor(1.1001, 1.101)).toBe(10_000);
 });
 
 test('add', () => {
@@ -35,7 +35,7 @@ test('add', () => {
   expect(add(-100, 200)).toBe(100);
   expect(add(0.1, 0.2)).toBe(0.3);
   expect(add(0.28, 0.01)).toBe(0.29);
-  expect(add(0.289999, 0.000001)).toBe(0.29);
+  expect(add(0.289_999, 0.000_001)).toBe(0.29);
   expect(add(0.29, 0.01)).toBe(0.3);
 });
 
@@ -47,7 +47,7 @@ test('sub', () => {
   expect(sub(-100, 200)).toBe(-300);
   expect(sub(0.1, 0.2)).toBe(-0.1);
   expect(sub(0.28, 0.01)).toBe(0.27);
-  expect(sub(0.289999, 0.000001)).toBe(0.289998);
+  expect(sub(0.289_999, 0.000_001)).toBe(0.289_998);
   expect(sub(0.29, 0.01)).toBe(0.28);
   expect(sub(3, 2, 1)).toBe(0);
 });
@@ -55,19 +55,19 @@ test('sub', () => {
 test('mul', () => {
   expect(mul(0)).toBe(0);
   expect(mul(0, 0)).toBe(0);
-  expect(mul(1000, 10)).toBe(10000);
+  expect(mul(1000, 10)).toBe(10_000);
   expect(mul(0.5, 3)).toBe(1.5);
-  expect(mul(-100, 200)).toBe(-20000);
+  expect(mul(-100, 200)).toBe(-20_000);
   expect(mul(0.1, 0.2)).toBe(0.02);
   expect(mul(0.28, 0.01)).toBe(0.0028);
-  expect(mul(0.00000231, 10000000)).toBe(23.1);
+  expect(mul(0.000_002_31, 10_000_000)).toBe(23.1);
 });
 
 test('div', () => {
   expect(div(0)).toBe(0);
   expect(div(0, 1)).toBe(0);
   expect(div(1000, 10)).toBe(100);
-  expect(div(0.5, 3)).toBe(0.16666666666666666);
+  expect(div(0.5, 3)).toBe(0.166_666_666_666_666_66);
   expect(div(-100, 200)).toBe(-0.5);
   expect(div(5.3, 0.1)).toBe(53);
   expect(div(0.28, 0.01)).toBe(28);
@@ -89,12 +89,12 @@ test('div', () => {
 //   expect(format(1.2, 3)).toBe('1.200');
 // });
 
-// test('toCurrency', () => {
-//   expect(toCurrency(0)).toBe('0.00');
-//   expect(toCurrency(1000)).toBe('1,000.00');
-//   expect(toCurrency(1000.5)).toBe('1,000.50');
-//   expect(toCurrency(1000.499)).toBe('1,000.50');
-//   expect(toCurrency(-1000.499)).toBe('-1,000.50');
+// test('toUSD', () => {
+//   expect(toUSD(0)).toBe('0.00');
+//   expect(toUSD(1000)).toBe('1,000.00');
+//   expect(toUSD(1000.5)).toBe('1,000.50');
+//   expect(toUSD(1000.499)).toBe('1,000.50');
+//   expect(toUSD(-1000.499)).toBe('-1,000.50');
 // });
 
 // test('toFixed', () => {
@@ -117,6 +117,19 @@ test.each([
   [1.45, 1, 1.4],
   [1.4, 2, 1.4],
   [1.455, 2, 1.45],
-])('trunc(%f, %i) = %s', (num, digits, expected) => {
-  expect(trunc(num, digits)).toBe(expected);
+])('trunc(%f, %i) = %s', (number, digits, expected) => {
+  expect(trunc(number, digits)).toBe(expected);
+});
+
+test.each([
+  [0, '0.00'],
+  [1, '1.00'],
+  [-1, '-1.00'],
+  [-1.1, '-1.10'],
+  [-1.115, '-1.12'],
+  [1.11, '1.11'],
+  [1.111, '1.11'],
+  [1.115, '1.12'],
+])('toUSD(%f) = %s', (x, expected) => {
+  expect(toUSD(x)).toBe(expected);
 });

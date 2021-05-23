@@ -14,18 +14,18 @@ export function valuesFrom<T>(o: T): T[keyof T][];
  * @param defaultValue value to fill in for missing keys from `o`
  * @returns
  */
-export function valuesFrom<T, U extends string[], V>(
+export function valuesFrom<T, U>(
   o: T,
-  normalizeKeys: U,
-  defaultValue: V,
-): (T[keyof T] | V)[];
+  normalizeKeys: string[],
+  defaultValue: U,
+): (T[keyof T] | U)[];
 
-export function valuesFrom<T, U extends string[], V>(
+export function valuesFrom<T, U>(
   o: T,
-  normalizeKeys?: U,
-  defaultValue?: V,
+  normalizeKeys: string[] = [],
+  defaultValue?: U,
 ) {
-  return !normalizeKeys.length
+  return normalizeKeys.length === 0
     ? Object.keys(o)
         .sort()
         .map<T[keyof T]>((k) => o[k])

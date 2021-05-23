@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`spreadsheet/adapters irpf 1`] = `
+Array [
+  Array [
+    "foo1",
+    0,
+    201,
+    "01/01: 200 compradas, R$1.01/ação
+01/01: 100 vendidas, R$1.99/ação, lucro de R$98.50
+01/01: 100 compradas, R$0.51/ação",
+  ],
+]
+`;
+
+exports[`spreadsheet/adapters position 1`] = `
+Array [
+  Array [
+    "ticker",
+    "buyQuantity",
+    "buyTotal",
+    "date",
+    "price",
+    "quantity",
+    "sellIrrf",
+    "sellProfit",
+    "sellProfitPercent",
+    "sellQuantity",
+    "sellTotal",
+  ],
+  Array [
+    "foo1",
+    200,
+    201,
+    "2020/01/01",
+    1.005,
+    200,
+    0,
+    0,
+    0,
+    0,
+    0,
+  ],
+  Array [
+    "foo1",
+    0,
+    0,
+    "2020/01/01",
+    1.005,
+    100,
+    1.5,
+    98.5,
+    0.98,
+    100,
+    199,
+  ],
+  Array [
+    "foo1",
+    100,
+    51,
+    "2020/01/01",
+    0.7575,
+    200,
+    0,
+    0,
+    0,
+    0,
+    0,
+  ],
+]
+`;

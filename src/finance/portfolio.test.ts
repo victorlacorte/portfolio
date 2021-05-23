@@ -125,10 +125,10 @@ describe('finance/portfolio-wrapper', () => {
     w.add(tSell);
     w.add(tBuy2);
 
-    const prevEntry = w.position[ticker][1]; // previous to last
+    const previousEntry = w.position[ticker][1]; // previous to last
     const lastEntry = w.position[ticker][2];
 
-    expect(lastEntry.price).toBe(averagePrice(tBuy2, prevEntry));
+    expect(lastEntry.price).toBe(averagePrice(tBuy2, previousEntry));
     expect(lastEntry.quantity).toBe(
       add(tBuy1.quantity, tBuy2.quantity, tSell.quantity),
     );

@@ -21,8 +21,8 @@ describe('daysIn', () => {
       { year: 2020, month: 2, days: 29 },
     ];
 
-    testCases.forEach(({ year, month, days }) => {
+    for (const { year, month, days } of testCases) {
       expect(daysIn(year, month)).toBe(days);
-    });
+    }
   });
 });

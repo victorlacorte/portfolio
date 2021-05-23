@@ -1,1 +1,1 @@
-export { position } from './spreadsheet/adapters';
+export { position, irpf } from './spreadsheet/adapters';

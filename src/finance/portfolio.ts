@@ -1,3 +1,4 @@
+// import * as R from 'ramda';
 import { add } from '../utils/number';
 import type { Portfolio, Position, Transaction } from '../types';
 
@@ -13,8 +14,12 @@ import {
 export default class implements Portfolio {
   private readonly _position: Position = {};
 
+  // TODO this is a major cause of error. We are shallow cloning the _position
   get position(): Position {
-    return JSON.parse(JSON.stringify(this._position));
+    // return JSON.parse(JSON.stringify(this._position));
+    // return R.clone(this._position);
+    // return this._position;
+    return { ...this._position };
   }
 
   private _isTickerInPosition(ticker: string): boolean {
@@ -24,7 +29,7 @@ export default class implements Portfolio {
   private _lastEntry(ticker: string): Position[string][number] | null {
     const last = this._position[ticker];
 
-    return last.length ? last[last.length - 1] : null;
+    return last.length > 0 ? last[last.length - 1] : null;
   }
 
   add(t: Transaction): void {

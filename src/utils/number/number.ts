@@ -41,44 +41,47 @@ export function multiplier(x: number): number {
  * Given a variable number of arguments, returns the maximum multiplier that
  * must be used to normalize an operation involving all of them.
  */
-export function correctionFactor(...args: number[]): number {
-  return args.reduce((acc, curr) => {
-    const currMultiplier = multiplier(curr);
+export function correctionFactor(...arguments_: number[]): number {
+  return arguments_.reduce((accumulator, current) => {
+    const currentMultiplier = multiplier(current);
 
-    return acc > currMultiplier ? acc : currMultiplier;
+    return accumulator > currentMultiplier ? accumulator : currentMultiplier;
   }, 1);
 }
 
-export function add(...args: number[]): number {
-  const corrFactor = correctionFactor(...args);
+export function add(...arguments_: number[]): number {
+  const corrFactor = correctionFactor(...arguments_);
 
   return (
-    args.reduce((acc, curr) => acc + round(corrFactor * curr), 0) / corrFactor
+    arguments_.reduce(
+      (accumulator, current) => accumulator + round(corrFactor * current),
+      0,
+    ) / corrFactor
   );
 }
 
-export function sub(...args: number[]): number {
-  const [first, ...rest] = args;
+export function sub(...arguments_: number[]): number {
+  const [first, ...rest] = arguments_;
 
-  return add(first, ...rest.map((num) => -num));
+  return add(first, ...rest.map((number) => -number));
 }
 
-export function mul(...args: number[]): number {
-  return args.reduce((acc, curr) => {
-    const corrFactor = correctionFactor(acc, curr);
+export function mul(...arguments_: number[]): number {
+  return arguments_.reduce((accumulator, current) => {
+    const corrFactor = correctionFactor(accumulator, current);
 
     return (
-      (round(corrFactor * acc) * round(corrFactor * curr)) /
+      (round(corrFactor * accumulator) * round(corrFactor * current)) /
       round(corrFactor ** 2)
     );
   }, 1);
 }
 
-export function div(...args: number[]): number {
-  return args.reduce((acc, curr) => {
-    const corrFactor = correctionFactor(acc, curr);
+export function div(...arguments_: number[]): number {
+  return arguments_.reduce((accumulator, current) => {
+    const corrFactor = correctionFactor(accumulator, current);
 
-    return round(corrFactor * acc) / round(corrFactor * curr);
+    return round(corrFactor * accumulator) / round(corrFactor * current);
   });
 }
 
@@ -129,11 +132,18 @@ export function div(...args: number[]): number {
 //   return numAsStr.join(decimalSeparator);
 // }
 
-// export function toCurrency(x: number): string {
-//   return x
-//     .toLocaleString('en-US', { style: 'currency', currency: 'USD' })
-//     .slice(1);
-// }
+/**
+ * Returns `x` formatted in en-US USD notation.
+ *
+ * @param x a numeric expression to be formatted as a currency amount
+ */
+export function toUSD(x: number): string {
+  const formatted = Math.abs(x)
+    .toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+    .slice(1);
+
+  return x >= 0 ? formatted : `-${formatted}`;
+}
 
 export function padStart(
   x: number,

@@ -1,6 +1,7 @@
 import { operations, positionColumnNames } from '../constants';
 import { valuesFrom } from './helpers';
 
+import { irpf as _irpf } from '../finance/irpf/functions';
 import Portfolio from '../finance/portfolio';
 import SimpleDate from '../utils/date';
 import type { Operation, SimpleDate as _SimpleDate } from '../types';
@@ -28,18 +29,14 @@ function makeSimpleDates({
   months: unknown[];
   days: unknown[];
 }): _SimpleDate[] {
-  return Array.from({ length: years.length }).map((_, i) =>
-    SimpleDate.make(Number(years[i]), Number(months[i]), Number(days[i])),
+  return Array.from({ length: years.length }).map((_, index) =>
+    SimpleDate.make(
+      Number(years[index]),
+      Number(months[index]),
+      Number(days[index]),
+    ),
   );
 }
-
-// Normalize return information
-const defaultPortfolioSellEntry = {
-  irrf: null,
-  soldTotal: null,
-  profit: null,
-  profitPercent: null,
-};
 
 export function position(
   rawYears: unknown[][],
@@ -67,31 +64,85 @@ export function position(
 
   const portfolio = new Portfolio();
 
-  makeSimpleDates({ years, months, days })
+  for (const [index, d] of makeSimpleDates({ years, months, days })
     .sort((d1, d2) => Number(d1.toJSDate()) - Number(d2.toJSDate()))
-    .forEach((d, i) => {
-      const price = Number(prices[i]);
-      const tax = Number(taxes[i]);
-      const ticker = tickers[i].toString().toLowerCase();
-      const quantity = Number(quantities[i]);
-      const irrf = irrfs[i] ? Number(irrfs[i]) : null;
+    .entries()) {
+    const price = Number(prices[index]);
+    const tax = Number(taxes[index]);
+    const ticker = tickers[index].toString().toLowerCase();
+    const quantity = Number(quantities[index]);
+    const irrf = irrfs[index] ? Number(irrfs[index]) : null;
 
-      portfolio.add({
-        date: d,
-        price,
-        tax,
-        ticker,
-        quantity:
-          sanitizeOperation(operations[i]) === 'sell' ? -quantity : quantity,
-        irrf,
-      });
+    portfolio.add({
+      date: d,
+      price,
+      tax,
+      ticker,
+      quantity:
+        sanitizeOperation(operations[index]) === 'sell' ? -quantity : quantity,
+      irrf,
     });
+  }
 
-  // TODO return header from v[0]?
   return [
-    ['ticker', ...positionColumnNames.sort()],
-    ...Object.entries(portfolio.position).flatMap(([k, v]) =>
-      v.map((props) => [k, ...valuesFrom(props, positionColumnNames, 0)]),
+    // TODO abstract in a function
+    ['ticker', ...positionColumnNames.sort()], // header
+    ...Object.entries(portfolio.position).flatMap(([ticker, entry]) =>
+      entry.map((props) => [
+        ticker,
+        // date.toString(),
+        ...valuesFrom(props, positionColumnNames, 0),
+      ]),
     ),
   ];
+}
+
+export function irpf(
+  year: number,
+  rawYears: unknown[][],
+  rawMonths: unknown[][],
+  rawDays: unknown[][],
+  rawTickers: unknown[][],
+  rawOperations: unknown[][],
+  rawQuantities: unknown[][],
+  rawPrices: unknown[][],
+  rawTaxes: unknown[][],
+  rawIrrfs: unknown[][],
+) {
+  const years = rawYears.flat();
+  const months = rawMonths.flat();
+  const days = rawDays.flat();
+  const tickers = rawTickers.flat();
+  const operations = rawOperations.flat();
+  const quantities = rawQuantities.flat();
+  const prices = rawPrices.flat();
+  const taxes = rawTaxes.flat();
+  const irrfs = rawIrrfs.flat();
+
+  const portfolio = new Portfolio();
+
+  for (const [index, d] of makeSimpleDates({ years, months, days })
+    .sort((d1, d2) => Number(d1.toJSDate()) - Number(d2.toJSDate()))
+    .entries()) {
+    const price = Number(prices[index]);
+    const tax = Number(taxes[index]);
+    const ticker = tickers[index].toString().toLowerCase();
+    const quantity = Number(quantities[index]);
+    const irrf = irrfs[index] ? Number(irrfs[index]) : null;
+
+    portfolio.add({
+      date: d,
+      price,
+      tax,
+      ticker,
+      quantity:
+        sanitizeOperation(operations[index]) === 'sell' ? -quantity : quantity,
+      irrf,
+    });
+  }
+
+  return Object.entries(portfolio.position).map(([k, v]) => [
+    k,
+    ...valuesFrom(_irpf(year, v)),
+  ]);
 }

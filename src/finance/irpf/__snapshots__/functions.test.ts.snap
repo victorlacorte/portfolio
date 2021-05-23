@@ -1,0 +1,6 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`finance/irpf/functions formatEntries works as expected 1`] = `
+"01/01: 100 compradas, R$1.00/ação
+01/01: 100 vendidas, R$1.00/ação, lucro de R$1.00"
+`;

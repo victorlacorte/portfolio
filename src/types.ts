@@ -8,7 +8,10 @@ export type SimpleDate = {
   year: number;
   month: number;
   day: number;
+  equals(s: SimpleDate): boolean;
   toJSDate(): Date;
+  toJSON(): string;
+  toString(): string;
 };
 
 export type Transaction = {
@@ -58,17 +61,22 @@ const numberColumnNames = [
 //   buyQuantity: Transaction['quantity'];
 //   buyTotal: number;
 // };
-type BuyEntry = Record<typeof buyEntryKeys[number], number>;
-type SellEntry = Record<typeof sellEntryKeys[number], number>;
 
-export type PositionEntry = {
+export type BaseEntry = {
   date: Transaction['date'];
   quantity: Transaction['quantity'];
   price: Transaction['price'];
-} & (
-  | (BuyEntry & Partial<Record<keyof SellEntry, never>>)
-  | (Partial<Record<keyof BuyEntry, never>> & SellEntry)
-);
+};
+
+export type BuyEntry = Record<typeof buyEntryKeys[number], number>;
+
+export type SellEntry = Record<typeof sellEntryKeys[number], number>;
+
+export type PositionEntry = BaseEntry &
+  (
+    | (BuyEntry & Partial<Record<keyof SellEntry, never>>)
+    | (SellEntry & Partial<Record<keyof BuyEntry, never>>)
+  );
 
 // export type PositionEntry = {
 //   [key in typeof numberColumnNames[number]]: number;
