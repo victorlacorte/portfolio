@@ -55,3 +55,18 @@ export const profitPercent: typeof _profitPercent = R.pipe(
   _profitPercent,
   truncate,
 );
+
+type CompareFn = (a: PositionEntry, b: PositionEntry) => number;
+const compareAscending: CompareFn = (a, b) =>
+  a.date.equals(b.date)
+    ? -1
+    : Number(a.date.toJSDate()) - Number(b.date.toJSDate());
+const compareDescending: CompareFn = (a, b) =>
+  b.date.equals(a.date)
+    ? 1
+    : Number(b.date.toJSDate()) - Number(a.date.toJSDate());
+
+export function sortByDate(
+  p: PositionEntry[],
+  ascending = true,
+): PositionEntry[] {}

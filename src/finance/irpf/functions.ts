@@ -82,8 +82,12 @@ export function formatEntries(
 }
 
 /**
+ * Log:
  * Sort entries descending and return the first one that satisfies
  * entry.date.year <= year or `undefined` if none are found
+ * The previous approach has an issue: sorting preserves relative order when the
+ * compare function returns 0. A solution would be to provide custom sorting
+ * functions to PositionEntries
  *
  * @param year
  * @param entries
@@ -93,13 +97,17 @@ export function lastEntryFromYear(
   entries: PositionEntry[],
 ): PositionEntry | undefined {
   const sorted = entries.sort(
-    (a, b) => Number(b.date.toJSDate()) - Number(a.date.toJSDate()),
+    (a, b) => Number(a.date.toJSDate()) - Number(b.date.toJSDate()),
   );
+  // Array.prototype.reverse
 
-  for (const e of sorted) {
-    if (e.date.year <= year) {
-      return e;
-    }
+  // for (const e of sorted) {
+  //   if (e.date.year <= year) {
+  //     return e;
+  //   }
+  // }
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    if (sorted[i].date.year <= year) return sorted[i];
   }
 }
 // Obtain:

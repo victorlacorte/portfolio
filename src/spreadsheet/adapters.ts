@@ -91,7 +91,7 @@ export function position(
       entry.map((props) => [
         ticker,
         // date.toString(),
-        ...valuesFrom(props, positionColumnNames, 0),
+        ...valuesFrom(props, positionColumnNames, 0).map((val) => String(val)),
       ]),
     ),
   ];
