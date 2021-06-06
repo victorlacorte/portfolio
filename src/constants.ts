@@ -28,4 +28,4 @@ export const positionColumnNames = [
   ...sellEntryKeys,
 ];
 
-export const operations = ['buy', 'sell'] as const;
+// export const operations = ['buy', 'sell'] as const;

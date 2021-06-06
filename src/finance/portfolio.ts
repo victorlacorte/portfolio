@@ -1,6 +1,6 @@
 // import * as R from 'ramda';
 import { add } from '../utils/number';
-import type { Portfolio, Position, Transaction } from '../types';
+import type { Portfolio, Position, PositionEntry, Transaction } from '../types';
 
 import {
   averagePrice,
@@ -9,6 +9,29 @@ import {
   profitPercent,
   sellTotal,
 } from './functions';
+
+function hasTicker(state: Position, ticker: string): boolean {
+  return Object.prototype.hasOwnProperty.call(state, ticker);
+}
+
+function lastEntryFrom(state: Position, ticker: string): PositionEntry | null {
+  const last = state[ticker];
+
+  return last?.length > 0 ? last[last.length - 1] : null;
+}
+
+function buyTransaction() {}
+function sellTransaction() {}
+function splitTransaction() {}
+function reverseSplitTransaction() {}
+function stockDividendTransaction() {}
+
+const portfolioReducer = {
+  buyTransaction,
+  sellTransaction,
+  splitTransaction,
+  // continue
+};
 
 // TODO truncate IRRF quantities
 export default class implements Portfolio {

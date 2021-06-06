@@ -61,3 +61,7 @@ The above was not conducted since it might not improve the result/report
 - How to represent stock splits ("desdobramento") or reverse stock splits
 (inplit? "grupamento")? It seems easy enough in the position but harder in the
 transaction sheet
+
+## Glossary
+
+IRRF: individual income tax

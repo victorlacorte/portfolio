@@ -1,6 +1,6 @@
-import { buyEntryKeys, operations, sellEntryKeys } from './constants';
+import { buyEntryKeys, sellEntryKeys } from './constants';
 
-export type Operation = typeof operations[number];
+// export type Operation = typeof operations[number];
 
 // TODO review which types are actually present in the project
 // Some of these might make sense only in the src/finance context
@@ -14,32 +14,45 @@ export type SimpleDate = {
   toString(): string;
 };
 
-export type Transaction = {
+type BuySellTransaction = {
   ticker: string;
   date: SimpleDate;
   quantity: number;
   price: number;
   tax: number;
-  // irrf not optional when quantity < 0 i.e. sell transaction
-  irrf?: number; // individual income tax?
 };
 
-// TODO buyPrice = (price * quantity + tax) / quantity
-// TODO notice we don't enforce much with this type: we can enter weird
-// combinations of buy/sell info in the transaction
-// TODO we need to have column names somewhere
+type SplitTransaction = {
+  ticker: string;
+  date: SimpleDate;
+  factor: number;
+};
 
-const numberColumnNames = [
-  'quantity',
-  'price',
-  'buyQuantity',
-  'buyTotal',
-  'sellIrrf',
-  'sellQuantity',
-  'sellTotal',
-  'sellProfit',
-  'sellProfitPercent',
-] as const;
+type StockDividendTransaction = {
+  ticker: string;
+  date: SimpleDate;
+  quantity: number;
+};
+
+// Transaction kinds are important to the portfolio reducer.
+export type Transaction =
+  | ({ kind: 'buy' } & BuySellTransaction)
+  | ({ kind: 'sell'; irrf: number } & BuySellTransaction)
+  | ({ kind: 'split' } & SplitTransaction)
+  | ({ kind: 'reverse split' } & SplitTransaction)
+  | ({ kind: 'stock dividend' } & StockDividendTransaction);
+
+// const numberColumnNames = [
+//   'quantity',
+//   'price',
+//   'buyQuantity',
+//   'buyTotal',
+//   'sellIrrf',
+//   'sellQuantity',
+//   'sellTotal',
+//   'sellProfit',
+//   'sellProfitPercent',
+// ] as const;
 
 // const stringColumnNames = ['date'] as const;
 
@@ -62,21 +75,28 @@ const numberColumnNames = [
 //   buyTotal: number;
 // };
 
-export type BaseEntry = {
-  date: Transaction['date'];
-  quantity: Transaction['quantity'];
-  price: Transaction['price'];
+// TODO Seems safe to assume these types are relevant only for the portfolio
+
+type BaseEntry = {
+  date: SimpleDate;
+  quantity: number;
+  price: number;
 };
 
-export type BuyEntry = Record<typeof buyEntryKeys[number], number>;
+export type BuyEntry = { kind: 'buy' } & Record<
+  typeof buyEntryKeys[number],
+  number
+>;
 
-export type SellEntry = Record<typeof sellEntryKeys[number], number>;
+export type SellEntry = { kind: 'sell' } & Record<
+  typeof sellEntryKeys[number],
+  number
+>;
 
-export type PositionEntry = BaseEntry &
-  (
-    | (BuyEntry & Partial<Record<keyof SellEntry, never>>)
-    | (SellEntry & Partial<Record<keyof BuyEntry, never>>)
-  );
+// This is enough to cover splits, reverse splits and stock dividends
+export type OtherEntry = { kind: 'other' };
+
+export type PositionEntry = BaseEntry & (BuyEntry | SellEntry | OtherEntry);
 
 // export type PositionEntry = {
 //   [key in typeof numberColumnNames[number]]: number;
@@ -88,6 +108,7 @@ export type PositionEntry = BaseEntry &
 
 export type Position = Record<string, PositionEntry[]>;
 
+// TODO it might be easier to construct a reducer style function
 export type Portfolio = {
   position: Position;
   add(t: Transaction): void;
