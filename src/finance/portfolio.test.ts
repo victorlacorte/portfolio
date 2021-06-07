@@ -2,8 +2,9 @@ import faker from 'faker';
 
 import SimpleDate from '../utils/date';
 import { add } from '../utils/number';
+import type { BuyTransaction, Position, Transaction } from '../types';
 
-import portfolioReducer from './portfolio';
+import portfolioReducer, { lastEntryFrom } from './portfolio';
 import { averagePrice } from './functions';
 
 // TODO tests did not break after modifying the portfolio sell entry
@@ -21,117 +22,49 @@ const makePrice = (): number => faker.datatype.float({ min: 0 });
 const makeTax = (): number => faker.datatype.float({ min: 0 });
 const makeIrrf = (): number => faker.datatype.float({ min: 0 });
 
-describe('finance/portfolio', () => {
-  test('Correctly processes a buy transaction', () => {
-    const w = new Portfolio();
-    const t = {
-      date,
-      ticker,
-      price: makePrice(),
-      quantity: makeBuyQuantity(),
-      tax: makeTax(),
-    };
+describe('finance/portfolioReducer', () => {
+  it('Correctly reproduces the example in https://www.bussoladoinvestidor.com.br/calculo-do-preco-medio-de-acoes/', () => {
+    const ticker = 'petr4';
+    const t: Transaction[] = [
+      {
+        kind: 'buy',
+        date: SimpleDate.make(2020, 2, 3),
+        ticker,
+        price: 9,
+        quantity: 100,
+        tax: 21.5,
+      },
+      {
+        kind: 'buy',
+        date: SimpleDate.make(2020, 2, 5),
+        ticker,
+        price: 12,
+        quantity: 100,
+        tax: 21.7,
+      },
+      {
+        kind: 'sell',
+        date: SimpleDate.make(2020, 2, 5),
+        ticker,
+        price: 11.5,
+        quantity: 50,
+        tax: 20.86,
+        irrf: 0.01,
+      },
+      {
+        kind: 'buy',
+        date: SimpleDate.make(2020, 2, 10),
+        ticker,
+        price: 15,
+        quantity: 200,
+        tax: 23.6,
+      },
+    ];
 
-    w.add(t);
+    const res = t.reduce(portfolioReducer, {});
 
-    const entry = w.position[ticker][0];
-
-    expect(entry.price).toBe(averagePrice(t));
-    expect(entry.quantity).toBe(t.quantity);
-  });
-
-  test('Correctly processes two buy transactions', () => {
-    const w = new Portfolio();
-    const t1 = {
-      date,
-      ticker,
-      price: makePrice(),
-      quantity: makeBuyQuantity(),
-      tax: makeTax(),
-    };
-    const t2 = {
-      date,
-      ticker,
-      price: makePrice(),
-      quantity: makeBuyQuantity(),
-      tax: makeTax(),
-    };
-
-    w.add(t1);
-    w.add(t2);
-
-    const firstEntry = w.position[ticker][0];
-    const secondEntry = w.position[ticker][1];
-
-    expect(secondEntry.price).toBe(averagePrice(t2, firstEntry));
-    expect(secondEntry.quantity).toBe(add(t1.quantity, t2.quantity));
-  });
-
-  test('Correctly processes a buy followed by a sell transaction', () => {
-    const w = new Portfolio();
-    const tBuy = {
-      date,
-      ticker,
-      price: makePrice(),
-      quantity: makeBuyQuantity(),
-      tax: makeTax(),
-    };
-    const tSell = {
-      date,
-      ticker,
-      price: makePrice(),
-      quantity: makeSellQuantity(),
-      tax: makeTax(),
-      irrf: makeIrrf(),
-    };
-
-    w.add(tBuy);
-    w.add(tSell);
-
-    const buyEntry = w.position[ticker][0];
-    const sellEntry = w.position[ticker][1];
-
-    // Sell transactions don't modify the average price
-    expect(sellEntry.price).toBe(buyEntry.price);
-    expect(sellEntry.quantity).toBe(add(tBuy.quantity, tSell.quantity));
-  });
-
-  test('Correctly processes a buy, sell and another buy transactions', () => {
-    const w = new Portfolio();
-    const tBuy1 = {
-      date,
-      ticker,
-      price: makePrice(),
-      quantity: makeBuyQuantity(),
-      tax: makeTax(),
-    };
-    const tSell = {
-      date,
-      ticker,
-      price: makePrice(),
-      quantity: makeSellQuantity(),
-      tax: makeTax(),
-      irrf: makeIrrf(),
-    };
-    const tBuy2 = {
-      date,
-      ticker,
-      price: makePrice(),
-      quantity: makeBuyQuantity(),
-      tax: makeTax(),
-    };
-
-    w.add(tBuy1);
-    w.add(tSell);
-    w.add(tBuy2);
-
-    const previousEntry = w.position[ticker][1]; // previous to last
-    const lastEntry = w.position[ticker][2];
-
-    expect(lastEntry.price).toBe(averagePrice(tBuy2, previousEntry));
-    expect(lastEntry.quantity).toBe(
-      add(tBuy1.quantity, tBuy2.quantity, tSell.quantity),
-    );
+    expect(res).toMatchSnapshot();
+    expect(lastEntryFrom(res, ticker).price).toBe(13.2314);
   });
 
   test('Throws when attempting to sell a non-existent ticker', () => {});

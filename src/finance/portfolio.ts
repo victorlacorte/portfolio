@@ -19,7 +19,10 @@ function hasTicker(state: Position, ticker: string): boolean {
   return Object.prototype.hasOwnProperty.call(state, ticker);
 }
 
-function lastEntryFrom(state: Position, ticker: string): PositionEntry | null {
+export function lastEntryFrom(
+  state: Position,
+  ticker: string,
+): PositionEntry | null {
   const last = state[ticker];
 
   return last?.length > 0 ? last[last.length - 1] : null;
@@ -37,7 +40,7 @@ function buyEntry(state: Position, transaction: BuyTransaction): Position {
           buyQuantity: quantity,
           buyTotal: buyTotal(price, quantity, tax),
           date,
-          price,
+          price: averagePrice(price, quantity, tax),
           quantity,
         },
       ],
@@ -52,7 +55,7 @@ function buyEntry(state: Position, transaction: BuyTransaction): Position {
   return {
     ...state,
     [ticker]: [
-      ...state.ticker,
+      ...state[ticker],
       {
         kind: 'buy',
         date,
@@ -84,7 +87,7 @@ function sellEntry(state: Position, transaction: SellTransaction): Position {
   return {
     ...state,
     [ticker]: [
-      ...state.ticker,
+      ...state[ticker],
       {
         kind: 'sell',
         date,

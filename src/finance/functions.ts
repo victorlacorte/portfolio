@@ -2,8 +2,14 @@ import * as R from 'ramda';
 import { add, div, mul, sub, trunc } from '../utils/number';
 
 type Base = (price: number, quantity: number, tax: number) => number;
+// type Profit = (
+//   ...params: [...base: Parameters<Base>, prevPrice: number]
+// ) => number;
 type Profit = (
-  ...params: [...base: Parameters<Base>, prevPrice: number]
+  price: number,
+  quantity: number,
+  tax: number,
+  prevPrice: number,
 ) => number;
 
 const truncate = (x: number): number => trunc(x, 4);
