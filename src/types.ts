@@ -22,25 +22,42 @@ type BuySellTransaction = {
   tax: number;
 };
 
-type SplitTransaction = {
+type BaseSplitTransaction = {
   ticker: string;
   date: SimpleDate;
   factor: number;
 };
 
-type StockDividendTransaction = {
+export type BuyTransaction = {
+  kind: 'buy';
+} & BuySellTransaction;
+
+export type SellTransaction = {
+  kind: 'sell';
+  irrf: number;
+} & BuySellTransaction;
+
+export type SplitTransaction = {
+  kind: 'split';
+} & BaseSplitTransaction;
+
+export type ReverseSplitTransaction = {
+  kind: 'reverse split';
+} & BaseSplitTransaction;
+
+export type StockDividendTransaction = {
+  kind: 'stock dividend';
   ticker: string;
   date: SimpleDate;
   quantity: number;
 };
 
-// Transaction kinds are important to the portfolio reducer.
 export type Transaction =
-  | ({ kind: 'buy' } & BuySellTransaction)
-  | ({ kind: 'sell'; irrf: number } & BuySellTransaction)
-  | ({ kind: 'split' } & SplitTransaction)
-  | ({ kind: 'reverse split' } & SplitTransaction)
-  | ({ kind: 'stock dividend' } & StockDividendTransaction);
+  | BuyTransaction
+  | SellTransaction
+  | SplitTransaction
+  | ReverseSplitTransaction
+  | StockDividendTransaction;
 
 // const numberColumnNames = [
 //   'quantity',
@@ -83,18 +100,15 @@ type BaseEntry = {
   price: number;
 };
 
-export type BuyEntry = { kind: 'buy' } & Record<
-  typeof buyEntryKeys[number],
-  number
->;
+type BuyEntry = { kind: 'buy' } & Record<typeof buyEntryKeys[number], number>;
 
-export type SellEntry = { kind: 'sell' } & Record<
+type SellEntry = { kind: 'sell' } & Record<
   typeof sellEntryKeys[number],
   number
 >;
 
 // This is enough to cover splits, reverse splits and stock dividends
-export type OtherEntry = { kind: 'other' };
+type OtherEntry = { kind: 'other' };
 
 export type PositionEntry = BaseEntry & (BuyEntry | SellEntry | OtherEntry);
 
@@ -107,9 +121,3 @@ export type PositionEntry = BaseEntry & (BuyEntry | SellEntry | OtherEntry);
 // };
 
 export type Position = Record<string, PositionEntry[]>;
-
-// TODO it might be easier to construct a reducer style function
-export type Portfolio = {
-  position: Position;
-  add(t: Transaction): void;
-};

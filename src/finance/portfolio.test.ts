@@ -3,7 +3,7 @@ import faker from 'faker';
 import SimpleDate from '../utils/date';
 import { add } from '../utils/number';
 
-import Portfolio from './portfolio';
+import portfolioReducer from './portfolio';
 import { averagePrice } from './functions';
 
 // TODO tests did not break after modifying the portfolio sell entry
@@ -21,7 +21,7 @@ const makePrice = (): number => faker.datatype.float({ min: 0 });
 const makeTax = (): number => faker.datatype.float({ min: 0 });
 const makeIrrf = (): number => faker.datatype.float({ min: 0 });
 
-describe('finance/portfolio-wrapper', () => {
+describe('finance/portfolio', () => {
   test('Correctly processes a buy transaction', () => {
     const w = new Portfolio();
     const t = {

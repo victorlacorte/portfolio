@@ -1,49 +1,56 @@
 import * as R from 'ramda';
 import { add, div, mul, sub, trunc } from '../utils/number';
-import type { PositionEntry, Transaction } from '../types';
 
-type Entry = Omit<PositionEntry, 'date'>;
+type Base = (price: number, quantity: number, tax: number) => number;
+type Profit = (
+  ...params: [...base: Parameters<Base>, prevPrice: number]
+) => number;
 
 const truncate = (x: number): number => trunc(x, 4);
 
-function _averagePrice(t: Transaction): number;
-function _averagePrice(t: Transaction, e: Entry): number;
-function _averagePrice(t: Transaction, e?: Entry): number {
-  const tTotal = buyTotal(t);
+function _averagePrice(price: number, quantity: number, tax: number): number;
+function _averagePrice(
+  price: number,
+  quantity: number,
+  tax: number,
+  prevPrice: number,
+  prevQuantity: number,
+): number;
+function _averagePrice(
+  price: number,
+  quantity: number,
+  tax: number,
+  prevPrice?: number,
+  prevQuantity?: number,
+): number {
+  const total = _buyTotal(price, quantity, tax);
 
-  if (e === undefined) {
-    return div(tTotal, t.quantity);
+  if (prevPrice === undefined && prevQuantity === undefined) {
+    return div(total, quantity);
   }
 
   return div(
-    add(mul(e.quantity, e.price), tTotal),
-    add(e.quantity, t.quantity),
+    add(mul(prevPrice, prevQuantity), total),
+    add(prevQuantity, quantity),
   );
 }
 
-const _buyTotal = (t: Transaction): number =>
-  add(mul(t.quantity, t.price), t.tax);
+const _buyTotal: Base = (price, quantity, tax): number =>
+  add(mul(price, quantity), tax);
 
-const _sellTotal = (t: Transaction): number =>
-  sub(mul(Math.abs(t.quantity), t.price), t.tax);
+const _sellTotal: Base = (price, quantity, tax): number =>
+  sub(mul(price, quantity), tax);
 
-const _profit = (t: Transaction, e: Entry): number =>
-  sub(mul(sub(t.price, e.price), Math.abs(t.quantity)), t.tax);
+const _profit: Profit = (price, quantity, tax, prevPrice) =>
+  _sellTotal(sub(price, prevPrice), quantity, tax);
 
-function _profitPercent(t: Transaction, e: Entry): number {
-  const soldQuantity = Math.abs(t.quantity);
-
-  return sub(
-    div(sub(mul(t.price, soldQuantity), t.tax), mul(e.price, soldQuantity)),
-    1,
-  );
-}
+const _profitPercent: Profit = (price, quantity, tax, prevPrice) =>
+  sub(div(_sellTotal(price, quantity, tax), mul(prevPrice, quantity)), 1);
 
 export const averagePrice: typeof _averagePrice = R.pipe(
   _averagePrice,
   truncate,
 );
-// export const averagePrice = _averagePrice;
 
 export const buyTotal: typeof _buyTotal = R.pipe(_buyTotal, truncate);
 
@@ -56,17 +63,13 @@ export const profitPercent: typeof _profitPercent = R.pipe(
   truncate,
 );
 
-type CompareFn = (a: PositionEntry, b: PositionEntry) => number;
-const compareAscending: CompareFn = (a, b) =>
-  a.date.equals(b.date)
-    ? -1
-    : Number(a.date.toJSDate()) - Number(b.date.toJSDate());
-const compareDescending: CompareFn = (a, b) =>
-  b.date.equals(a.date)
-    ? 1
-    : Number(b.date.toJSDate()) - Number(a.date.toJSDate());
-
-export function sortByDate(
-  p: PositionEntry[],
-  ascending = true,
-): PositionEntry[] {}
+// TODO these functions are simple date utilities
+// type CompareFn = (a: PositionEntry, b: PositionEntry) => number;
+// const compareAscending: CompareFn = (a, b) =>
+//   a.date.equals(b.date)
+//     ? -1
+//     : Number(a.date.toJSDate()) - Number(b.date.toJSDate());
+// const compareDescending: CompareFn = (a, b) =>
+//   b.date.equals(a.date)
+//     ? 1
+//     : Number(b.date.toJSDate()) - Number(a.date.toJSDate());

@@ -7,6 +7,7 @@ import { validate } from './helpers';
 export type YMD = Pick<_SimpleDate, 'year' | 'month' | 'day'>;
 
 export default class SimpleDate implements _SimpleDate {
+  // We might need to overload a string factory method
   static make({ year, month, day }: YMD): _SimpleDate;
   static make(year: number, month: number, day: number): _SimpleDate;
   static make(
