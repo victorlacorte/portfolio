@@ -12,6 +12,8 @@ type Profit = (
   prevPrice: number,
 ) => number;
 
+//type Split = (x: number, factor: number)=> number;
+
 const truncate = (x: number): number => trunc(x, 4);
 
 function _averagePrice(price: number, quantity: number, tax: number): number;
@@ -68,6 +70,9 @@ export const profitPercent: typeof _profitPercent = R.pipe(
   _profitPercent,
   truncate,
 );
+
+export const multiply: typeof mul = R.pipe(mul, truncate);
+export const divide: typeof div = R.pipe(div, truncate);
 
 // TODO these functions are simple date utilities
 // type CompareFn = (a: PositionEntry, b: PositionEntry) => number;

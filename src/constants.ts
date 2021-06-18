@@ -28,4 +28,12 @@ export const positionColumnNames = [
   ...sellEntryKeys,
 ];
 
+export const transactionKinds = [
+  'buy',
+  'sell',
+  'split',
+  'reverse split',
+  'stock dividend',
+] as const;
+
 // export const operations = ['buy', 'sell'] as const;

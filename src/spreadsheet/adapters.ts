@@ -2,7 +2,7 @@ import { operations, positionColumnNames } from '../constants';
 import { valuesFrom } from './helpers';
 
 import { irpf as _irpf } from '../finance/irpf/functions';
-import Portfolio from '../finance/portfolio';
+import Portfolio from '../finance/portfolio/portfolio';
 import SimpleDate from '../utils/date';
 import type { Operation, SimpleDate as _SimpleDate } from '../types';
 

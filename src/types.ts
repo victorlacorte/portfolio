@@ -1,4 +1,4 @@
-import { buyEntryKeys, sellEntryKeys } from './constants';
+import { buyEntryKeys, sellEntryKeys, transactionKinds } from './constants';
 
 // export type Operation = typeof operations[number];
 
@@ -28,29 +28,27 @@ type BaseSplitTransaction = {
   factor: number;
 };
 
-export type BuyTransaction = {
-  kind: 'buy';
-} & BuySellTransaction;
+type TransactionKind<T extends typeof transactionKinds[number]> = {
+  kind: T;
+};
+
+export type BuyTransaction = TransactionKind<'buy'> & BuySellTransaction;
 
 export type SellTransaction = {
-  kind: 'sell';
   irrf: number;
-} & BuySellTransaction;
+} & TransactionKind<'sell'> &
+  BuySellTransaction;
 
-export type SplitTransaction = {
-  kind: 'split';
-} & BaseSplitTransaction;
+export type SplitTransaction = TransactionKind<'split'> & BaseSplitTransaction;
 
-export type ReverseSplitTransaction = {
-  kind: 'reverse split';
-} & BaseSplitTransaction;
+export type ReverseSplitTransaction = TransactionKind<'reverse split'> &
+  BaseSplitTransaction;
 
 export type StockDividendTransaction = {
-  kind: 'stock dividend';
   ticker: string;
   date: SimpleDate;
   quantity: number;
-};
+} & TransactionKind<'stock dividend'>;
 
 export type Transaction =
   | BuyTransaction
@@ -100,17 +98,18 @@ type BaseEntry = {
   price: number;
 };
 
-type BuyEntry = { kind: 'buy' } & Record<typeof buyEntryKeys[number], number>;
+type BuyEntry = TransactionKind<'buy'> &
+  Record<typeof buyEntryKeys[number], number>;
 
-type SellEntry = { kind: 'sell' } & Record<
-  typeof sellEntryKeys[number],
-  number
->;
+type SellEntry = TransactionKind<'sell'> &
+  Record<typeof sellEntryKeys[number], number>;
 
-// This is enough to cover splits, reverse splits and stock dividends
-type OtherEntry = { kind: 'other' };
+type SplitEntry = TransactionKind<'split'>;
+type ReverseSplitEntry = TransactionKind<'reverse split'>;
+type StockDividendEntry = TransactionKind<'stock dividend'>;
 
-export type PositionEntry = BaseEntry & (BuyEntry | SellEntry | OtherEntry);
+export type PositionEntry = BaseEntry &
+  (BuyEntry | SellEntry | SplitEntry | ReverseSplitEntry | StockDividendEntry);
 
 // export type PositionEntry = {
 //   [key in typeof numberColumnNames[number]]: number;
