@@ -1,0 +1,99 @@
+{
+  "Sheet1": [
+    ["CLIENTE:", "123456789", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", ""],
+    [
+      "PRAÇA",
+      "C/V",
+      "TIPO DE MERCADO",
+      "ESPECIFICAÇÃO DO TÍTULO",
+      "OBS(*)",
+      "QUANTIDADE",
+      "PREÇO DE LIQUIDAÇÃO(R$)",
+      "COMPRA/VENDA (R$)",
+      "D/C"
+    ],
+    [
+      "1-Bovespa",
+      "V",
+      "VIS",
+      "AAAA4 PN      N1",
+      "",
+      "100",
+      "13,79",
+      "1.379,00",
+      "C"
+    ],
+    ["", "", "", "SUBTOTAL:", "", "100", "13,7900", "1.379,00", ""],
+    ["", "", "", "", "", "", "", "", ""],
+    ["RESUMO DOS NEGÓCIOS", "", "", "", "", "RESUMO FINANCEIRO", "", "", ""],
+    [
+      "DEBÊNTURES:",
+      "0.00",
+      "VENDAS À VISTA:",
+      "1379.00",
+      "",
+      "VALOR LÍQ. DAS OPER.(1):",
+      "1379.00 C",
+      "TAXA DE LIQUIDAÇÃO(2):",
+      "0.34 D"
+    ],
+    [
+      "COMPRAS À VISTA:",
+      "0.00",
+      "OPÇÕES - COMPRA:",
+      "0.00",
+      "",
+      "TAXA REG.(3):",
+      "0.00 D",
+      "TOTAL(1+2+3)A:",
+      "1378.66 C"
+    ],
+    [
+      "OPÇÕES - VENDA:",
+      "0.00",
+      "OPER. À TERMO:",
+      "0.00",
+      "",
+      "TX. TER/OPC/FUT:",
+      "0.00 D",
+      "TX. A.N.A.:",
+      "0.00 D"
+    ],
+    [
+      "OPER. FUT.:",
+      "0.00",
+      "VLR. OPER. C/ TIT. PUB.:",
+      "0.00",
+      "",
+      "EMOLUMENTOS:",
+      "0.06 D",
+      "TOTAL BOLSA B:",
+      "-0.06 D"
+    ],
+    [
+      "VLR. OPER.:",
+      "1379.00",
+      "VLR. AJU. P/ FUT.:",
+      "0.00",
+      "",
+      "CORRETAGEM:",
+      "0.00 D",
+      "ISS:",
+      "0.00 D"
+    ],
+    [
+      "IR S/ CORRETAGEM:",
+      "0.00",
+      "IRRF S/ DAY TRADE:",
+      "0.00",
+      "",
+      "IRRF S/ OPER., BASE 1379.00:",
+      "0.06 D",
+      "OUTRAS:",
+      "0,00 D"
+    ],
+    ["", "", "", "", "", "", "", "LIQ.(A+B) P/ 31/05/2021:", "1378.60 C"],
+    []
+  ]
+}

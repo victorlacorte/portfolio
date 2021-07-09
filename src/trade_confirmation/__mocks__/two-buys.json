@@ -1,0 +1,121 @@
+{
+  "Sheet1": [
+    [
+      "CLIENTE:",
+      "123456789",
+      "JOHN DOE",
+      "DATA PREGÃO",
+      "06072021",
+      "NUM NOTA",
+      "123456789",
+      "",
+      ""
+    ],
+    ["", "", "", "", "", "", "", "", ""],
+    [
+      "PRAÇA",
+      "C/V",
+      "TIPO DE MERCADO",
+      "ESPECIFICAÇÃO DO TÍTULO",
+      "OBS(*)",
+      "QUANTIDADE",
+      "PREÇO DE LIQUIDAÇÃO(R$)",
+      "COMPRA/VENDA (R$)",
+      "D/C"
+    ],
+    [
+      "1-Bovespa",
+      "C",
+      "VIS",
+      "AAAA3 ON      NM",
+      "",
+      "200",
+      "4,16",
+      "832,00",
+      "D"
+    ],
+    ["", "", "", "SUBTOTAL:", "", "200", "4,1600", "832,00", ""],
+    [
+      "1-Bovespa",
+      "C",
+      "VIS",
+      "BBBB4 ON      NM",
+      "",
+      "200",
+      "5,61",
+      "1.122,00",
+      "D"
+    ],
+    ["", "", "", "SUBTOTAL:", "", "200", "5,6100", "1.122,00", ""],
+    ["", "", "", "", "", "", "", "", ""],
+    ["RESUMO DOS NEGÓCIOS", "", "", "", "", "RESUMO FINANCEIRO", "", "", ""],
+    [
+      "DEBÊNTURES:",
+      "0.00",
+      "VENDAS À VISTA:",
+      "0.00",
+      "",
+      "VALOR LÍQ. DAS OPER.(1):",
+      "-1954.00 D",
+      "TAXA DE LIQUIDAÇÃO(2):",
+      "0.48 D"
+    ],
+    [
+      "COMPRAS À VISTA:",
+      "1954.00",
+      "OPÇÕES - COMPRA:",
+      "0.00",
+      "",
+      "TAXA REG.(3):",
+      "0.00 D",
+      "TOTAL(1+2+3)A:",
+      "-1954.48 D"
+    ],
+    [
+      "OPÇÕES - VENDA:",
+      "0.00",
+      "OPER. À TERMO:",
+      "0.00",
+      "",
+      "TX. TER/OPC/FUT:",
+      "0.00 D",
+      "TX. A.N.A.:",
+      "0.00 D"
+    ],
+    [
+      "OPER. FUT.:",
+      "0.00",
+      "VLR. OPER. C/ TIT. PUB.:",
+      "0.00",
+      "",
+      "EMOLUMENTOS:",
+      "0.09 D",
+      "TOTAL BOLSA B:",
+      "-0.09 D"
+    ],
+    [
+      "VLR. OPER.:",
+      "1954.00",
+      "VLR. AJU. P/ FUT.:",
+      "0.00",
+      "",
+      "CORRETAGEM:",
+      "0.00 D",
+      "ISS:",
+      "0.00 D"
+    ],
+    [
+      "IR S/ CORRETAGEM:",
+      "0.00",
+      "IRRF S/ DAY TRADE:",
+      "0.00",
+      "",
+      "IRRF S/ OPER., BASE 0.00:",
+      "0.00 D",
+      "OUTRAS:",
+      "0,00 D"
+    ],
+    ["", "", "", "", "", "", "", "LIQ.(A+B) P/ 08/07/2021:", "-1954.57 D"],
+    []
+  ]
+}

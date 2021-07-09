@@ -1,0 +1,109 @@
+{
+  "Sheet1": [
+    [
+      "CLIENTE:",
+      "123456789",
+      "JOHN DOE",
+      "DATA PREGÃO",
+      "05072021",
+      "NUM NOTA",
+      "123456789",
+      "",
+      ""
+    ],
+    ["", "", "", "", "", "", "", "", ""],
+    [
+      "PRAÇA",
+      "C/V",
+      "TIPO DE MERCADO",
+      "ESPECIFICAÇÃO DO TÍTULO",
+      "OBS(*)",
+      "QUANTIDADE",
+      "PREÇO DE LIQUIDAÇÃO(R$)",
+      "COMPRA/VENDA (R$)",
+      "D/C"
+    ],
+    [
+      "1-Bovespa",
+      "C",
+      "VIS",
+      "AAAA4 PN  EJ  N1",
+      "",
+      "200",
+      "25,01",
+      "5.002,00",
+      "D"
+    ],
+    ["", "", "", "SUBTOTAL:", "", "200", "25,0100", "5.002,00", ""],
+    ["", "", "", "", "", "", "", "", ""],
+    ["RESUMO DOS NEGÓCIOS", "", "", "", "", "RESUMO FINANCEIRO", "", "", ""],
+    [
+      "DEBÊNTURES:",
+      "0.00",
+      "VENDAS À VISTA:",
+      "0.00",
+      "",
+      "VALOR LÍQ. DAS OPER.(1):",
+      "-5002.00 D",
+      "TAXA DE LIQUIDAÇÃO(2):",
+      "1.25 D"
+    ],
+    [
+      "COMPRAS À VISTA:",
+      "5002.00",
+      "OPÇÕES - COMPRA:",
+      "0.00",
+      "",
+      "TAXA REG.(3):",
+      "0.00 D",
+      "TOTAL(1+2+3)A:",
+      "-5003.25 D"
+    ],
+    [
+      "OPÇÕES - VENDA:",
+      "0.00",
+      "OPER. À TERMO:",
+      "0.00",
+      "",
+      "TX. TER/OPC/FUT:",
+      "0.00 D",
+      "TX. A.N.A.:",
+      "0.00 D"
+    ],
+    [
+      "OPER. FUT.:",
+      "0.00",
+      "VLR. OPER. C/ TIT. PUB.:",
+      "0.00",
+      "",
+      "EMOLUMENTOS:",
+      "0.35 D",
+      "TOTAL BOLSA B:",
+      "-0.35 D"
+    ],
+    [
+      "VLR. OPER.:",
+      "5002.00",
+      "VLR. AJU. P/ FUT.:",
+      "0.00",
+      "",
+      "CORRETAGEM:",
+      "0.00 D",
+      "ISS:",
+      "0.00 D"
+    ],
+    [
+      "IR S/ CORRETAGEM:",
+      "0.00",
+      "IRRF S/ DAY TRADE:",
+      "0.00",
+      "",
+      "IRRF S/ OPER., BASE 0.00:",
+      "0.00 D",
+      "OUTRAS:",
+      "0,00 D"
+    ],
+    ["", "", "", "", "", "", "", "LIQ.(A+B) P/ 07/07/2021:", "-5003.60 D"],
+    []
+  ]
+}
